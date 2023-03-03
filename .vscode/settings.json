@@ -1,0 +1,14 @@
+{
+  "editor.fontSize": 13,
+  "editor.wordWrapColumn": 80,
+  "editor.wordWrap": "bounded",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.enable": true,
+  "editor.hover.delay": 200,
+  "scss.lint.unknownAtRules": "ignore"
+}
