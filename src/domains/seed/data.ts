@@ -8,6 +8,6 @@ export const shirtSeeds: ShirtSeed[] = [
   'Saint Laurent'
 ].map((name) => ({
   name,
-  image_url: `/images/${name.replace(/\s/g, '-')}.png`,
+  image_url: `/${name.replace(/\s/g, '-')}.png`,
   price: 8
 }));

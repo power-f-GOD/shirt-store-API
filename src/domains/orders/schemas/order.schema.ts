@@ -5,7 +5,12 @@ import { OrderItem } from './order-item.schema';
 
 export type OrderDocument = HydratedDocument<Order>;
 
-@Schema()
+@Schema({
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  }
+})
 export class Order {
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: OrderItem.name }])
   items: OrderItem[];
@@ -19,14 +24,8 @@ export class Order {
   @Prop()
   cost: number;
 
-  @Prop()
+  @Prop({ max: 1, min: 0 })
   discount: number;
-
-  @Prop({ type: Date, required: true })
-  created_at: string;
-
-  @Prop({ type: Date, required: true })
-  updated_at: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
