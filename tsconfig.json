@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "importHelpers": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -17,15 +19,6 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "importHelpers": true,
-    "allowJs": true,
-    "strict": true,
-    "noEmit": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "strictPropertyInitialization": false,
-    "downlevelIteration": true
+    "strictPropertyInitialization": false
   }
 }
