@@ -6,6 +6,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MONGODB_URI } from './constants';
 import { OrdersModule } from './orders/orders.module';
+import { SeedModule } from './seed/seed.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { OrdersModule } from './orders/orders.module';
       cache: true,
       expandVariables: true
     }),
-    MongooseModule.forRoot(MONGODB_URI)
+    MongooseModule.forRoot(MONGODB_URI),
+    SeedModule,
+    UtilsModule
   ],
   controllers: [AppController],
   providers: [AppService]
