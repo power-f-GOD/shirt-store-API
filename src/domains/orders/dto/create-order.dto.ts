@@ -1,21 +1,21 @@
-import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { Expose } from 'class-transformer';
+import { IsObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Order } from '../schemas';
 import { OrderItemDto } from './order-item.dto';
 
-export class CreateOrderDto implements Pick<Order, 'items'> {
+export class CreateOrderDto {
   @ApiProperty({
-    type: Array,
+    type: Object,
     description: 'Number or count of the shirt type.',
-    example: <OrderItemDto[]>[
-      { count: 2, name: 'Givenchy' },
-      { count: 5, name: 'Amiri' }
-    ],
+    example: <Record<string, OrderItemDto>>{
+      Givenchy: { count: 2, name: 'Givenchy' },
+      Amiri: { count: 5, name: 'Amiri' }
+    },
     required: true
   })
-  @ValidateNested({ each: true })
-  @Type(() => OrderItemDto)
-  items: OrderItemDto[];
+  @Expose()
+  @IsObject()
+  @ValidateNested()
+  items: Record<string, OrderItemDto>;
 }

@@ -7,6 +7,8 @@ export type OrderItemDocument = HydratedDocument<OrderItem>;
 
 @Schema()
 export class OrderItem {
+  _id?: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -22,8 +24,12 @@ export class OrderItem {
   @Prop({ default: 8 })
   price?: number;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Order' })
-  order?: Order;
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Order',
+    required: true
+  })
+  order: Order;
 }
 
 export const OrderItemSchema = SchemaFactory.createForClass(OrderItem);

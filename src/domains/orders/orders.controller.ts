@@ -5,29 +5,69 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  Req
 } from '@nestjs/common';
+import { Request } from 'express';
+
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderDto, UpdateOrderDto } from './dto';
+import {
+  LoggerService,
+  NormalizeResponseService,
+  PrettifyService
+} from 'src/utils';
+import { BaseQueryDto } from 'src/commons/dtos';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private response: NormalizeResponseService,
+    private logger: LoggerService,
+    private prettify: PrettifyService
+  ) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(@Body() body: CreateOrderDto, @Req() request: Request) {
+    this.logger.debug(
+      `Creating order for user, ${
+        request.user.name
+      }, with payload: ${this.prettify.pretty(body)}...`
+    );
+
+    try {
+      return this.response.success(await this.ordersService.create(body));
+    } catch (e: any) {
+      this.logger.error(e.message || e);
+      return this.response.error(e.message || e);
+    }
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  async findAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
+    this.logger.debug(`Getting orders for user, ${request.user.name}...`);
+
+    try {
+      return this.response.success(await this.ordersService.findAll(request));
+    } catch (e: any) {
+      this.logger.error(e.message || e);
+      return this.response.error(e.message || e);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
+  async findOne(@Param('id') id: string, @Req() request: Request) {
+    this.logger.debug(
+      `Getting order with id, ${id}, for user, ${request.user.name}...`
+    );
+
+    try {
+      return this.response.success(await this.ordersService.findOne(id));
+    } catch (e: any) {
+      this.logger.error(e.message || e);
+      return this.response.error(e.message || e);
+    }
   }
 
   @Patch(':id')

@@ -46,15 +46,17 @@ export class DTOValidatorService {
     try {
       await this.validate<DataType>(dto, data, options);
     } catch (e: any) {
+      // Revisit: To-do: Create a recursive function to extract `constraints`.
       const validationErrors =
-        e?.[0].constraints ||
-        e?.[0].children?.[0].children?.[0]?.constraints ||
-        {};
+        e?.[0]?.constraints || e?.[0]?.children?.[0]?.constraints;
+      e?.[0]?.children?.[0]?.children?.[0]?.constraints || {};
+
+      const message = !this.utils.isEmptyObject(validationErrors)
+        ? Object.keys(validationErrors).map((name) => validationErrors[name])
+        : `Hughh.🤦🏾 A fatal gateway error occurred while trying to process your request. It's not you, it's us. We'll look into it.🙏🏾`;
 
       throw new WsException({
-        message: !this.utils.isEmptyObject(validationErrors)
-          ? Object.keys(validationErrors).map((name) => validationErrors[name])
-          : `Hughh.🤦🏾 A fatal gateway error occurred while trying to process your request. It's not you, it's us. We'll look into it.🙏🏾`,
+        message: Array.isArray(message) ? message.join(' ') : message,
         error: true
       });
     }

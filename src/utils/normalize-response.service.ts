@@ -8,7 +8,7 @@ import {
 
 @Injectable()
 export class NormalizeResponseService {
-  success<T = any>(data?: T, message?: string | null, path?: string) {
+  success<T = unknown>(data?: T, message?: string | null, path?: string) {
     return {
       ...(data ? { data } : {}),
       ...(message ? { message } : {}),

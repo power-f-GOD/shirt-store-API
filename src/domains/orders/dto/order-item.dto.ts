@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
-import { Order, OrderItem } from '../schemas';
+import { OrderItem } from '../schemas';
 
-export class OrderItemDto implements OrderItem {
+export class OrderItemDto implements Omit<OrderItem, 'order'> {
   @ApiProperty({
     type: 'string',
     description: 'Name of the shirt.',
@@ -33,6 +33,4 @@ export class OrderItemDto implements OrderItem {
   @IsNumber()
   @IsOptional()
   price?: number;
-
-  order?: Order;
 }

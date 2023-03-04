@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClassTransformer } from 'class-transformer';
 import { Validator } from 'class-validator';
+import { SocketServerService } from './socket-server.service';
 import { DTOValidatorService } from './dto-validator.service';
 import { LoggerService } from './logger.service';
 import { NormalizeResponseService } from './normalize-response.service';
@@ -15,14 +16,16 @@ import { UtilsService } from './utils.service';
     PrettifyService,
     ClassTransformer,
     Validator,
-    UtilsService
+    UtilsService,
+    SocketServerService
   ],
   exports: [
     DTOValidatorService,
     LoggerService,
     NormalizeResponseService,
     PrettifyService,
-    UtilsService
+    UtilsService,
+    SocketServerService
   ]
 })
 export class UtilsModule {}
