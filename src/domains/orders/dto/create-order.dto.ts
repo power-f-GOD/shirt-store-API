@@ -2,20 +2,25 @@ import { Expose } from 'class-transformer';
 import { IsObject, ValidateNested } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { OrderItemDto } from './order-item.dto';
+import { CreateOrderItemDto } from './create-order-item.dto';
 
 export class CreateOrderDto {
   @ApiProperty({
-    type: Object,
-    description: 'Number or count of the shirt type.',
-    example: <Record<string, OrderItemDto>>{
-      Givenchy: { count: 2, name: 'Givenchy' },
-      Amiri: { count: 5, name: 'Amiri' }
+    description:
+      "A map of `item` names to `CreateOrderItemDto`. However, note that `name` in this context's `item` object is not so much required since the `item` `key` would be (or is) the `name` of the `item`.",
+    properties: {
+      '[item_name]': {
+        $ref: '#/components/schemas/CreateOrderItemDto'
+      }
+    },
+    example: <Record<string, CreateOrderItemDto>>{
+      Givenchy: { count: 2 },
+      Amiri: { count: 5 }
     },
     required: true
   })
   @Expose()
   @IsObject()
   @ValidateNested()
-  items: Record<string, OrderItemDto>;
+  items: Record<string, CreateOrderItemDto>;
 }

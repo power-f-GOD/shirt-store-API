@@ -6,12 +6,11 @@ import { User } from '../schemas';
 export class CreateUserDto implements Pick<User, 'name'> {
   @ApiProperty({
     type: String,
-    description: 'Unique name of the `user`.',
+    description: 'The (unique) name of the `user`.',
     example: 'John Doe',
-    required: true,
-    uniqueItems: true
+    required: true
   })
-  @IsString({ each: true })
+  @IsString()
   @IsNotEmpty()
   name: string;
 }

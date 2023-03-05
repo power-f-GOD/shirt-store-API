@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { OrderItem } from '../schemas';
 
-export class OrderItemDto implements Omit<OrderItem, 'order'> {
+export class CreateOrderItemDto implements Pick<OrderItem, 'count'> {
   @ApiProperty({
     type: 'string',
     description: 'Name of the shirt.',
@@ -10,8 +10,9 @@ export class OrderItemDto implements Omit<OrderItem, 'order'> {
     required: true
   })
   @IsString()
+  @IsOptional()
   @MaxLength(30)
-  name: string;
+  name?: string;
 
   @ApiProperty({
     type: 'number',
@@ -22,15 +23,9 @@ export class OrderItemDto implements Omit<OrderItem, 'order'> {
   @IsNumber()
   count: number;
 
-  @IsNumber()
-  @IsOptional()
   cost?: number;
 
-  @IsNumber()
-  @IsOptional()
   actual_cost?: number;
 
-  @IsNumber()
-  @IsOptional()
   price?: number;
 }

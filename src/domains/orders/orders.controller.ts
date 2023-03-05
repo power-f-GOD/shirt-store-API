@@ -1,25 +1,28 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
 import { Request } from 'express';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiFoundResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger';
 
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderDto } from './dto';
+import { CreateOrderDto } from './dto';
 import {
   LoggerService,
   NormalizeResponseService,
   PrettifyService
 } from 'src/utils';
-import { BaseQueryDto } from 'src/commons/dtos';
+import { BaseQueryDto, ErrorResponseDto } from 'src/commons/dtos';
+import { Order } from './schemas';
+import { AppDomainNamesEnum } from 'src/enums';
 
-@Controller('orders')
+@ApiTags(AppDomainNamesEnum.ORDERS)
+@Controller(AppDomainNamesEnum.ORDERS)
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
@@ -28,6 +31,10 @@ export class OrdersController {
     private prettify: PrettifyService
   ) {}
 
+  @ApiOperation({ summary: 'Create a new order placed by `request` user.' })
+  @ApiBody({ type: CreateOrderDto })
+  @ApiCreatedResponse({ type: Order })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   @Post()
   async create(@Body() body: CreateOrderDto, @Req() request: Request) {
     this.logger.debug(
@@ -44,6 +51,8 @@ export class OrdersController {
     }
   }
 
+  @ApiOperation({ summary: 'Get all orders belonging to `request` user.' })
+  @ApiFoundResponse({ type: Order, isArray: true })
   @Get()
   async findAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
     this.logger.debug(`Getting orders for user, ${request.user.name}...`);
@@ -56,6 +65,11 @@ export class OrdersController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Get an order (by `id`) belonging to `request` user.'
+  })
+  @ApiFoundResponse({ type: Order })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: Request) {
     this.logger.debug(
@@ -70,13 +84,13 @@ export class OrdersController {
     }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
+  //   return this.ordersService.update(+id, updateOrderDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.ordersService.remove(+id);
+  // }
 }

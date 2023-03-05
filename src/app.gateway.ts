@@ -77,12 +77,11 @@ export class AppGateway
   }
 
   handleDisconnect(socket: Socket) {
-    socket.offAny();
-    socket.disconnect();
     const user = this.socket.users.get(socket.id);
 
     if (user) {
       this.socket.usersSocketIds.delete(this.socket.users.get(socket.id)!._id);
+      socket.leave(user._id!);
     }
 
     this.socket.users.delete(socket.id);
@@ -92,5 +91,8 @@ export class AppGateway
         socket: socket.id
       })}>`
     );
+    socket.offAny();
+
+    // socket = null as any;
   }
 }

@@ -8,6 +8,6 @@ export class AppService {
   }
 
   sayHello() {
-    return 'Hello, Shirt Store!';
+    return { 'Hello!': 'Shirt Store!' };
   }
 }

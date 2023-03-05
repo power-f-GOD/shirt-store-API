@@ -1,25 +1,28 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
 import { Request } from 'express';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiFoundResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags
+} from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto } from './dto';
 import {
   LoggerService,
   NormalizeResponseService,
   PrettifyService
 } from 'src/utils';
 import { User } from './schemas';
+import { ErrorResponseDto } from 'src/commons/dtos';
+import { AppDomainNamesEnum } from 'src/enums';
 
-@Controller(`${User.name}s`)
+@ApiTags(AppDomainNamesEnum.USERS)
+@Controller(AppDomainNamesEnum.USERS)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -28,6 +31,10 @@ export class UsersController {
     private prettify: PrettifyService
   ) {}
 
+  @ApiOperation({ summary: 'Create new user.' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiCreatedResponse({ type: User })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   @Post()
   async create(@Body() body: CreateUserDto, @Req() request: Request) {
     this.logger.debug(
@@ -44,9 +51,14 @@ export class UsersController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Get (existing) user (by `name`).'
+  })
+  @ApiFoundResponse({ type: User })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Get(':name')
   async getOne(@Param('name') name: string) {
-    this.logger.debug(`Getting user with name, ${name}...`);
+    this.logger.debug(`Getting user by name, ${name}...`);
 
     try {
       return this.response.success(await this.usersService.getOne(name));
@@ -56,13 +68,13 @@ export class UsersController {
     }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(+id, updateUserDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersService.remove(+id);
+  // }
 }

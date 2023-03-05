@@ -54,11 +54,11 @@ export class OrdersGateway extends AppGateway {
         const data = payload.data as ComputeDiscountDto;
 
         // Augment payload to pass validation
-        for (const name in data.items) data.items[name].name = name;
-        console.log(JSON.stringify(data.items));
+        // for (const name in data.items) data.items[name].name = name;
         await this.dtoValidator.gateway(ComputeDiscountDto, data);
 
         try {
+          console.log(socket.id, '...DDD');
           socket.emit(
             GatewayEventsEnum.ORDER,
             this.response.success(

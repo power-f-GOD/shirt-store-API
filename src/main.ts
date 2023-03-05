@@ -13,15 +13,7 @@ import { PORT } from './constants';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
-  const config = new DocumentBuilder()
-    .setTitle('Shirt Store')
-    .setDescription('API for Shirt Store UI.')
-    .setVersion('1.0')
-    .addTag('shire-store')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.enableCors({
     origin: /localhost/i,
@@ -30,6 +22,15 @@ const bootstrap = async () => {
   app.setGlobalPrefix('/api');
   app.use('/public', __static(join(__dirname, '..', 'public')));
   app.use(cookieParser());
+
+  const config = new DocumentBuilder()
+    .setTitle('Shirt Store')
+    .setDescription('API for Shirt Store UI.')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api', app, document);
   await app.listen(PORT, () =>
     setTimeout(
       () => console.log(`Server listening on PORT=${PORT}, BTW.`),
