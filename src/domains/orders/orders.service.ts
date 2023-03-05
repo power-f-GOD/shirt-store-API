@@ -3,11 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model } from 'mongoose';
 
-import { BaseQueryDto } from 'src/commons/dtos';
+import { BaseQueryDto } from 'src/shared/dtos';
 import { ShirtSeed } from '../seed/schemas';
 import { SeedService } from '../seed/seed.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderDto } from './dtos/create-order.dto';
+import { UpdateOrderDto } from './dtos/update-order.dto';
 import { Order, OrderDocument } from './schemas';
 
 @Injectable()

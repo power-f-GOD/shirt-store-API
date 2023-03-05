@@ -13,7 +13,7 @@ import {
   NormalizeResponseService,
   PrettifyService,
   SocketServerService
-} from 'src/utils/';
+} from 'src/shared/services';
 import { UsersService } from './domains/users/users.service';
 import { User } from './domains/users/schemas';
 // import { BadRequestTransformationFilter } from 'src/utils';

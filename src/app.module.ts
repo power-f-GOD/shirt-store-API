@@ -4,9 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppService } from './app.service';
 import { MONGODB_URI } from './constants';
+import { SharedModule } from './shared/shared.module';
 import { OrdersModule } from './domains/orders/orders.module';
 import { SeedModule } from './domains/seed/seed.module';
-import { UtilsModule } from './utils/utils.module';
 import { UsersModule } from './domains/users/users.module';
 import { AppGateway } from './app.gateway';
 import { AppController } from './app.controller';
@@ -21,7 +21,7 @@ import { AppController } from './app.controller';
     }),
     MongooseModule.forRoot(MONGODB_URI),
     SeedModule,
-    UtilsModule,
+    SharedModule,
     UsersModule
   ],
   controllers: [AppController],

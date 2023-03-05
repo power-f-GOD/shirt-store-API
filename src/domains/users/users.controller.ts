@@ -11,14 +11,14 @@ import {
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto';
+import { CreateUserDto } from './dtos';
 import {
   LoggerService,
   NormalizeResponseService,
   PrettifyService
-} from 'src/utils';
+} from 'src/shared/services';
 import { User } from './schemas';
-import { ErrorResponseDto } from 'src/commons/dtos';
+import { ErrorResponseDto } from 'src/shared/dtos';
 import { AppDomainNamesEnum } from 'src/enums';
 
 @ApiTags(AppDomainNamesEnum.USERS)

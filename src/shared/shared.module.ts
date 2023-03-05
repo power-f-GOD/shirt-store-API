@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ClassTransformer } from 'class-transformer';
 import { Validator } from 'class-validator';
-import { SocketServerService } from './socket-server.service';
-import { DTOValidatorService } from './dto-validator.service';
-import { LoggerService } from './logger.service';
-import { NormalizeResponseService } from './normalize-response.service';
-import { PrettifyService } from './prettify.service';
-import { UtilsService } from './utils.service';
+
+import { BaseQueryDto, GatewayDto } from './dtos';
+import {
+  DTOValidatorService,
+  LoggerService,
+  NormalizeResponseService,
+  PrettifyService,
+  SocketServerService,
+  UtilsService
+} from './services';
 
 @Module({
   providers: [
@@ -17,9 +21,13 @@ import { UtilsService } from './utils.service';
     ClassTransformer,
     Validator,
     UtilsService,
-    SocketServerService
+    SocketServerService,
+    BaseQueryDto,
+    GatewayDto
   ],
   exports: [
+    BaseQueryDto,
+    GatewayDto,
     DTOValidatorService,
     LoggerService,
     NormalizeResponseService,
@@ -28,4 +36,4 @@ import { UtilsService } from './utils.service';
     SocketServerService
   ]
 })
-export class UtilsModule {}
+export class SharedModule {}

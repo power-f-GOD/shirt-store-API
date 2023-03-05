@@ -11,13 +11,13 @@ import {
 } from '@nestjs/swagger';
 
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto';
+import { CreateOrderDto } from './dtos';
 import {
   LoggerService,
   NormalizeResponseService,
   PrettifyService
-} from 'src/utils';
-import { BaseQueryDto, ErrorResponseDto } from 'src/commons/dtos';
+} from 'src/shared/services';
+import { BaseQueryDto, ErrorResponseDto } from 'src/shared/dtos';
 import { Order } from './schemas';
 import { AppDomainNamesEnum } from 'src/enums';
 

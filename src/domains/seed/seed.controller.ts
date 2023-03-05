@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { SeedService } from './seed.service';
-import { LoggerService, NormalizeResponseService } from 'src/utils';
+import { LoggerService, NormalizeResponseService } from 'src/shared/services';
 import { AppDomainNamesEnum } from 'src/enums';
 import { ShirtSeed } from './schemas';
 

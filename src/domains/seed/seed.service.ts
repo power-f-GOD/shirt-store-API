@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { LoggerService } from 'src/utils';
+import { LoggerService } from 'src/shared/services';
 import { ShirtSeed, ShirtSeedDocument } from './schemas';
 import { shirtSeeds } from './data';
 

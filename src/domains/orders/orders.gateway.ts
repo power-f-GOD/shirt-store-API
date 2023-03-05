@@ -9,7 +9,7 @@ import { Socket } from 'socket.io';
 
 import { WS_PORT } from 'src/constants';
 import { OrdersService } from './orders.service';
-import { GatewayDto } from 'src/commons/dtos';
+import { GatewayDto } from 'src/shared/dtos';
 import { GatewayEventsEnum, GatewayPathsEnum } from 'src/enums';
 import { AppGateway } from 'src/app.gateway';
 import {
@@ -18,9 +18,9 @@ import {
   NormalizeResponseService,
   PrettifyService,
   SocketServerService
-} from 'src/utils';
+} from 'src/shared/services';
 import { UsersService } from '../users/users.service';
-import { ComputeDiscountDto } from './dto';
+import { ComputeDiscountDto } from './dtos';
 
 // @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 // @UseFilters(BadRequestTransformationFilter)

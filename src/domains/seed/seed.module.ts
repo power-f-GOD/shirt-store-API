@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { SharedModule } from 'src/shared/shared.module';
+
 import { SeedService } from './seed.service';
 import { SeedController } from './seed.controller';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ShirtSeed, ShirtSeedSchema } from './schemas';
-import { UtilsModule } from 'src/utils/utils.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: ShirtSeed.name, schema: ShirtSeedSchema }
     ]),
-    UtilsModule
+    SharedModule
   ],
   controllers: [SeedController],
   providers: [SeedService],
