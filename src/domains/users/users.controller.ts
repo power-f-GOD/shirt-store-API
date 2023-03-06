@@ -15,7 +15,7 @@ import { CreateUserDto } from './dtos';
 import {
   LoggerService,
   NormalizeResponseService,
-  PrettifyService
+  UtilsService
 } from 'src/shared/services';
 import { User } from './schemas';
 import { ErrorResponseDto } from 'src/shared/dtos';
@@ -28,7 +28,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private response: NormalizeResponseService,
     private logger: LoggerService,
-    private prettify: PrettifyService
+    private utils: UtilsService
   ) {}
 
   @ApiOperation({ summary: 'Create new user.' })
@@ -40,7 +40,7 @@ export class UsersController {
     this.logger.debug(
       `Creating user for user, ${
         request.user.name
-      }, with payload: ${this.prettify.pretty(body)}...`
+      }, with payload: ${this.utils.prettify(body)}...`
     );
 
     try {

@@ -2,6 +2,14 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UtilsService {
+  prettify = <T = any>(object: T) => {
+    try {
+      return JSON.stringify(object, null, 2);
+    } catch (e) {
+      return String(object);
+    }
+  };
+
   isObject(subject: any) {
     if (typeof subject !== 'object' || Array.isArray(subject) || !subject) {
       return false;

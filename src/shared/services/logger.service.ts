@@ -1,14 +1,38 @@
-import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 
-import { PrettifyService } from './prettify.service';
+import { UtilsService } from './utils.service';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class LoggerService extends ConsoleLogger {
-  constructor(private prettify: PrettifyService) {
+  constructor(private utils: UtilsService) {
     super();
   }
 
-  private getCallerWithMessage(message: string, stack?: string) {
+  log(message: unknown, context?: string) {
+    super.log(this.getCallerWithMessage(message), context);
+  }
+
+  debug(message: unknown, context?: string) {
+    super.debug(this.getCallerWithMessage(message), context);
+  }
+
+  warn(message: unknown, context?: string) {
+    super.warn(this.getCallerWithMessage(message), context);
+  }
+
+  verbose(message: unknown, optionalParams_0: any, optionalParams_1?: string) {
+    super.verbose(
+      this.getCallerWithMessage(message),
+      optionalParams_0,
+      optionalParams_1
+    );
+  }
+
+  error(e: any, stack?: string, context?: string) {
+    super.error(this.getCallerWithMessage(e, stack || e.stack), stack, context);
+  }
+
+  private getCallerWithMessage(message: unknown, stack?: string) {
     return `<<${
       ((/at \w+\.(\w+)/.exec(new Error().stack!.split('\n')[3]) || '')[1] ||
         this.context ||
@@ -20,37 +44,9 @@ export class LoggerService extends ConsoleLogger {
     }>> ${
       typeof message === 'string'
         ? message
-        : Object.keys(message).length
-        ? this.prettify.pretty(message)
+        : this.utils.isObject(message)
+        ? this.utils.prettify(message)
         : message
     } ${stack ? `- ${stack}` : ''}`;
-  }
-
-  log(message: any, context?: string) {
-    super.log(this.getCallerWithMessage(message), context);
-  }
-
-  debug(message: any, context?: string) {
-    super.debug(this.getCallerWithMessage(message), context);
-  }
-
-  warn(message: any, context?: string) {
-    super.warn(this.getCallerWithMessage(message), context);
-  }
-
-  verbose(message: any, optionalParams_0: any, optionalParams_1?: string) {
-    super.verbose(
-      this.getCallerWithMessage(message),
-      optionalParams_0,
-      optionalParams_1
-    );
-  }
-
-  error(message: any, stack?: string, context?: string) {
-    super.error(
-      this.getCallerWithMessage(message, stack || message.stack),
-      stack,
-      context
-    );
   }
 }

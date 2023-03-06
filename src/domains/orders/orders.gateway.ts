@@ -16,7 +16,7 @@ import {
   DTOValidatorService,
   LoggerService,
   NormalizeResponseService,
-  PrettifyService,
+  UtilsService,
   SocketServerService
 } from 'src/shared/services';
 import { UsersService } from '../users/users.service';
@@ -33,9 +33,9 @@ export class OrdersGateway extends AppGateway {
     protected response: NormalizeResponseService,
     protected socket: SocketServerService,
     protected dtoValidator: DTOValidatorService,
-    protected prettify: PrettifyService
+    protected utils: UtilsService
   ) {
-    super(usersService, response, socket, logger, prettify);
+    super(usersService, response, socket, logger, utils);
     this.logger.setContext(OrdersGateway.name);
   }
 
@@ -46,7 +46,7 @@ export class OrdersGateway extends AppGateway {
     payload: GatewayDto<unknown>
   ) {
     this.logger.debug(
-      `Computing order discount with payload, ${this.prettify.pretty(payload)}`
+      `Computing order discount with payload, ${this.utils.prettify(payload)}`
     );
 
     switch (payload.path) {

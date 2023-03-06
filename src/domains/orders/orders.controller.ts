@@ -15,7 +15,7 @@ import { CreateOrderDto } from './dtos';
 import {
   LoggerService,
   NormalizeResponseService,
-  PrettifyService
+  UtilsService
 } from 'src/shared/services';
 import { BaseQueryDto, ErrorResponseDto } from 'src/shared/dtos';
 import { Order } from './schemas';
@@ -28,7 +28,7 @@ export class OrdersController {
     private readonly ordersService: OrdersService,
     private response: NormalizeResponseService,
     private logger: LoggerService,
-    private prettify: PrettifyService
+    private utils: UtilsService
   ) {}
 
   @ApiOperation({ summary: 'Create a new order placed by `request` user.' })
@@ -40,7 +40,7 @@ export class OrdersController {
     this.logger.debug(
       `Creating order for user, ${
         request.user.name
-      }, with payload: ${this.prettify.pretty(body)}...`
+      }, with payload: ${this.utils.prettify(body)}...`
     );
 
     try {

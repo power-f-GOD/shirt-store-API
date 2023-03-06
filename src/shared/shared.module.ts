@@ -7,7 +7,6 @@ import {
   DTOValidatorService,
   LoggerService,
   NormalizeResponseService,
-  PrettifyService,
   SocketServerService,
   UtilsService
 } from './services';
@@ -17,7 +16,6 @@ import {
     DTOValidatorService,
     LoggerService,
     NormalizeResponseService,
-    PrettifyService,
     ClassTransformer,
     Validator,
     UtilsService,
@@ -31,7 +29,6 @@ import {
     DTOValidatorService,
     LoggerService,
     NormalizeResponseService,
-    PrettifyService,
     UtilsService,
     SocketServerService
   ]

@@ -5,21 +5,17 @@ import {
   WebSocketGateway
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
 
 import { WS_PORT } from 'src/constants';
 import {
   LoggerService,
   NormalizeResponseService,
-  PrettifyService,
-  SocketServerService
+  SocketServerService,
+  UtilsService
 } from 'src/shared/services';
 import { UsersService } from './domains/users/users.service';
 import { User } from './domains/users/schemas';
-// import { BadRequestTransformationFilter } from 'src/utils';
 
-@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-// @UseFilters(BadRequestTransformationFilter)
 @WebSocketGateway(WS_PORT, {
   cors: { origin: /localhost/i },
   transports: ['websocket', 'polling']
@@ -32,7 +28,7 @@ export class AppGateway
     protected response: NormalizeResponseService,
     protected socket: SocketServerService,
     protected logger: LoggerService,
-    protected prettify: PrettifyService
+    protected utils: UtilsService
   ) {
     this.logger.setContext(AppGateway.name);
   }
@@ -58,7 +54,7 @@ export class AppGateway
 
       // if (!user.name) {socket.emit('authentication', this.response.success(e, e.message || e));}
       this.logger.debug(
-        `Sockets shook hands! <${this.prettify.pretty({
+        `Sockets shook hands! <${this.utils.prettify({
           user: user?.name || user?._id,
           socket: socket.id
         })}>`
@@ -86,7 +82,7 @@ export class AppGateway
 
     this.socket.users.delete(socket.id);
     this.logger.debug(
-      `Sockets called it a day! <${this.prettify.pretty({
+      `Sockets called it a day! <${this.utils.prettify({
         user: user?.name || user?._id,
         socket: socket.id
       })}>`
