@@ -6,7 +6,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { WS_PORT } from 'src/constants';
 import {
   LoggerService,
   NormalizeResponseService,
@@ -16,8 +15,8 @@ import {
 import { UsersService } from './domains/users/users.service';
 import { User } from './domains/users/schemas';
 
-@WebSocketGateway(WS_PORT, {
-  cors: { origin: /localhost/i },
+@WebSocketGateway(undefined, {
+  cors: { origin: /localhost:3000/i, credentials: false },
   transports: ['websocket', 'polling']
 })
 export class AppGateway
@@ -87,8 +86,6 @@ export class AppGateway
         socket: socket.id
       })}>`
     );
-    socket.offAny();
-
-    // socket = null as any;
+    setImmediate(() => socket.rooms.forEach((room) => socket.leave(room)));
   }
 }

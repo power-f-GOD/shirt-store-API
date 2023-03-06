@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UtilsService {
+  formatNumber(number: number | bigint, options?: Intl.NumberFormatOptions) {
+    return new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 3,
+      ...options
+    }).format(number);
+  }
   prettify = <T = any>(object: T) => {
     try {
       return JSON.stringify(object, null, 2);

@@ -4,8 +4,10 @@ import { Request } from 'express';
 import { Model } from 'mongoose';
 
 import { BaseQueryDto } from 'src/shared/dtos';
+import { UtilsService } from 'src/shared/services';
 import { ShirtSeed } from '../seed/schemas';
 import { SeedService } from '../seed/seed.service';
+import { CreateOrderItemDto } from './dtos';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
 import { Order, OrderDocument } from './schemas';
@@ -16,7 +18,8 @@ export class OrdersService {
 
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    private seedService: SeedService
+    private seedService: SeedService,
+    private utils: UtilsService
   ) {
     (async () =>
       (await this.seedService.getShirts()).map((shirt) => {
@@ -51,29 +54,91 @@ export class OrdersService {
     return `This action removes a #${id} order`;
   }
 
-  computeDiscount(items: CreateOrderDto['items']) {
-    const shirts = { ...items };
-    const discount = 0.2;
-    let cost = 0;
+  async computeDiscount(
+    items: CreateOrderDto['items']
+  ): Promise<Omit<Required<CreateOrderDto>, 'items'>> {
+    const itemsToArray: CreateOrderItemDto[] = [];
     let actual_cost = 0;
 
-    for (const name in shirts) {
+    for (const name in items) {
       const shirtSeed = this.shirtSeeds.get(name);
-      const shirt = shirts[name];
+      const item = items[name];
 
       if (!shirtSeed) throw new Error(`Invalid shirt, "${name}".`);
-      shirt.actual_cost = shirtSeed.price * shirt.count;
-      shirt.cost = shirtSeed.price * shirt.count;
-      // Deleting this props in order to reduce size of response payload
-      delete (shirt as any).name;
-      delete (shirt as any).count;
-      shirts[name] = shirt;
-      cost += shirt.cost;
-      actual_cost = +cost.toFixed(2);
+
+      if (item.count) {
+        itemsToArray.push({ count: item.count, price: shirtSeed.price });
+      }
+
+      actual_cost += shirtSeed.price * item.count;
     }
 
-    cost = +(cost * (1 - discount)).toFixed(2);
+    const [firstDiscountedCost] = await Promise.all([
+      this.getDiscountedCostFirstWay(itemsToArray, actual_cost)
+    ]);
 
-    return { discount, items: shirts, cost, actual_cost };
+    // console.log({ firstDiscountedCost, actual_cost });
+    // console.log({ itemsToArray });
+    return {
+      discount: +this.utils.formatNumber(
+        (actual_cost - firstDiscountedCost) / actual_cost,
+        { maximumFractionDigits: 2 }
+      ),
+      actual_cost,
+      cost: firstDiscountedCost
+    };
+  }
+
+  private getDiscountedCostFirstWay(
+    _items: CreateOrderItemDto[],
+    actual_cost: number
+  ) {
+    const items = _items.map((item) => ({ ...item }));
+
+    if (items.length < 2) return Promise.resolve(actual_cost);
+
+    const price = items[0].price;
+    let discountedCost = 0;
+
+    while (items.length > 0) {
+      let lim = items.length - 1;
+      let groupCount = 0;
+
+      for (let i = 0; i <= lim; i++) {
+        if (items[i]?.count) {
+          groupCount++;
+          items[i].count--;
+        } else {
+          items.splice(i, 1);
+          i--;
+          lim = items.length - 1;
+        }
+
+        if (!items[i]) break;
+      }
+
+      discountedCost += groupCount
+        ? groupCount * price! * (1 - this.getDiscountPerGroupCount(groupCount)!)
+        : 0;
+    }
+
+    return Promise.resolve(
+      +this.utils.formatNumber(discountedCost || actual_cost)
+    );
+  }
+
+  private getDiscountPerGroupCount(groupCount: number) {
+    switch (groupCount) {
+      case 5:
+        return 0.2;
+      case 4:
+        return 0.15;
+      case 3:
+        return 0.1;
+      case 2:
+        return 0.05;
+      default:
+        return 0;
+    }
   }
 }

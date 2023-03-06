@@ -35,6 +35,13 @@ export class DTOValidatorService {
     );
   }
 
+  /**
+   * Note: Never wrap this method (where it is used/called) in a try/catch block so the appropriate error message(s) can be sent/emitted to the client (which is already done here).
+   * @param dto
+   * @param data
+   * @param options
+   * @param excludeForNumberConversion
+   */
   async gateway<DataType extends Record<string, any> = Record<string, any>>(
     dto: ClassConstructor<any>,
     data: DataType,

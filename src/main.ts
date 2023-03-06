@@ -17,8 +17,8 @@ const bootstrap = async () => {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.enableCors({
-    origin: /localhost/i,
-    credentials: true
+    origin: /localhost:3000/i,
+    credentials: false
   });
   app.setGlobalPrefix('/api');
   app.use('/public', __static(join(__dirname, '..', 'public')));

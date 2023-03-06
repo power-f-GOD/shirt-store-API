@@ -3,8 +3,11 @@ import { IsObject, ValidateNested } from 'class-validator';
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 import { CreateOrderItemDto } from './create-order-item.dto';
+import { Order } from '../schemas';
 
-export class CreateOrderDto {
+export class CreateOrderDto
+  implements Pick<Partial<Order>, 'cost' | 'actual_cost' | 'discount'>
+{
   @ApiProperty({
     description:
       "A map of `item_name`s to `CreateOrderItemDto`. However, note that `name` in this context's `item` object is not so much required since the `item` `key` would be (or is) the `name` of the `item`.",
@@ -22,4 +25,10 @@ export class CreateOrderDto {
   @IsObject()
   @ValidateNested()
   items: Record<string, CreateOrderItemDto>;
+
+  cost?: number;
+
+  actual_cost?: number;
+
+  discount?: number;
 }
