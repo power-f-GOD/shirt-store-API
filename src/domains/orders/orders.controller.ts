@@ -7,6 +7,7 @@ import {
   ApiFoundResponse,
   ApiNotFoundResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags
 } from '@nestjs/swagger';
 
@@ -53,8 +54,9 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Get all orders belonging to `request` user.' })
   @ApiFoundResponse({ type: Order, isArray: true })
+  @ApiQuery({ type: BaseQueryDto })
   @Get()
-  async findAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
+  async getAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
     this.logger.debug(`Getting orders for user, ${request.user.name}...`);
 
     try {

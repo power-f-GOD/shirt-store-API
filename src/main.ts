@@ -10,6 +10,7 @@ import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { PORT } from './constants';
+import { CreateOrderItemDto } from './domains/orders/dtos';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
@@ -28,7 +29,9 @@ const bootstrap = async () => {
     .setDescription('API for Shirt Store UI.')
     .setVersion('1.0')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [CreateOrderItemDto]
+  });
 
   SwaggerModule.setup('api', app, document);
   await app.listen(PORT, () =>

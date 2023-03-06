@@ -1,13 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiProperty,
+  ApiPropertyOptional
+} from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { OrderItem } from '../schemas';
 
+@ApiExtraModels()
 export class CreateOrderItemDto implements Pick<OrderItem, 'count'> {
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: 'string',
     description: 'Name of the shirt.',
-    example: 'Givenchy',
-    required: true
+    example: 'Givenchy'
   })
   @IsString()
   @IsOptional()
