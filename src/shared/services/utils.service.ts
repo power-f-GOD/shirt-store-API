@@ -4,7 +4,8 @@ import { Injectable } from '@nestjs/common';
 export class UtilsService {
   formatNumber(number: number | bigint, options?: Intl.NumberFormatOptions) {
     return new Intl.NumberFormat('en-US', {
-      maximumFractionDigits: 3,
+      maximumFractionDigits: 2,
+      useGrouping: false,
       ...options
     }).format(number);
   }
