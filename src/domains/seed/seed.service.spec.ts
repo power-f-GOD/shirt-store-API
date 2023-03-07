@@ -1,4 +1,4 @@
-import { getModelToken, MongooseModule } from '@nestjs/mongoose';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { SharedModule } from 'src/shared/shared.module';
@@ -19,13 +19,13 @@ describe('SeedService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [MongooseModule.forFeature(), SharedModule],
+      imports: [SharedModule],
       providers: [
         SeedService,
         {
           provide: getModelToken(ShirtSeed.name),
           useValue: {
-            find: async () => {
+            async find() {
               return findResult;
             }
           }

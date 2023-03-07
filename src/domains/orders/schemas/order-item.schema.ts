@@ -20,14 +20,6 @@ export class OrderItem {
   count: number;
 
   @ApiProperty({ type: Number })
-  @Prop({ required: true })
-  cost?: number;
-
-  @ApiProperty({ type: Number })
-  @Prop({ required: true })
-  actual_cost?: number;
-
-  @ApiProperty({ type: Number })
   @Prop({ default: 8 })
   price?: number;
 
@@ -36,7 +28,7 @@ export class OrderItem {
     ref: 'Order',
     required: true
   })
-  order: Order;
+  order?: Order;
 }
 
 export const OrderItemSchema = SchemaFactory.createForClass(OrderItem);

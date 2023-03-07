@@ -19,13 +19,16 @@ export class OrdersService {
     private utils: UtilsService
   ) {}
 
-  create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = new this.orderModel(createOrderDto);
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const order = await this.orderModel.create(createOrderDto);
 
-    return order.save();
+    return order;
   }
 
-  async findAll({ user, query }: Request<any, any, any, BaseQueryDto>) {
+  async getAll({
+    user,
+    query
+  }: Request<any, any, any, BaseQueryDto>): Promise<Order[]> {
     return await this.orderModel
       .find({ _id: user._id })
       .limit(query.count || 10)
@@ -33,7 +36,7 @@ export class OrdersService {
       .exec();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Order | null> {
     return await this.orderModel.findById(id).exec();
   }
 

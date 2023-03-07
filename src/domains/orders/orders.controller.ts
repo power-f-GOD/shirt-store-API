@@ -39,9 +39,9 @@ export class OrdersController {
   @Post()
   async create(@Body() body: CreateOrderDto, @Req() request: Request) {
     this.logger.debug(
-      `Creating order for user, ${
+      `Creating order for user, "${
         request.user.name
-      }, with payload: ${this.utils.prettify(body)}...`
+      }", with payload: ${this.utils.prettify(body)}...`
     );
 
     try {
@@ -60,7 +60,7 @@ export class OrdersController {
     this.logger.debug(`Getting orders for user, ${request.user.name}...`);
 
     try {
-      return this.response.success(await this.ordersService.findAll(request));
+      return this.response.success(await this.ordersService.getAll(request));
     } catch (e: any) {
       this.logger.error(e.message || e);
       return this.response.error(e.message || e);

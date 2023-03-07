@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "postinstall": "husky install",
-    "produce": "git checkout main && git pull origin main && git merge dev && git push && git checkout dev",
+    "produce": "pnpm test && git checkout main && git pull origin main && git merge dev && git push && git checkout dev",
     "stash": "git stash save -m echo `date`"
   },
   "dependencies": {

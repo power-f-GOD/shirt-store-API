@@ -40,7 +40,7 @@ export class Order {
   items: OrderItem[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  user: User;
+  user?: User;
 
   @ApiProperty({ type: 'string' })
   created_at: string;

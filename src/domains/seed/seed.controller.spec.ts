@@ -28,7 +28,7 @@ describe('SeedController', () => {
         {
           provide: getModelToken(ShirtSeed.name),
           useValue: {
-            find: async () => {
+            async find() {
               return findResult;
             }
           }
