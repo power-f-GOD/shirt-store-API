@@ -79,20 +79,25 @@ export class OrdersService {
       this.computeDiscountedCostFirstWay(itemsToArray, actual_cost),
       this.computeDiscountedCostSecondWay(itemsToArray, actual_cost, itemCount)
     ]);
-    const lowestPossibleCost = Math.min(
+    const lowestPossibleDiscountedCost = Math.min(
       firstDiscountedCost,
       secondDiscountedCost
     );
 
-    console.log({ firstDiscountedCost, secondDiscountedCost, actual_cost });
+    console.log({
+      firstDiscountedCost,
+      secondDiscountedCost,
+      lowestPossibleDiscountedCost,
+      actual_cost
+    });
 
     return {
       discount: +this.utils.formatNumber(
-        (actual_cost - lowestPossibleCost) / actual_cost,
+        (actual_cost - lowestPossibleDiscountedCost) / actual_cost,
         { maximumFractionDigits: 3 }
       ),
       actual_cost,
-      cost: lowestPossibleCost
+      cost: lowestPossibleDiscountedCost
     };
   }
 

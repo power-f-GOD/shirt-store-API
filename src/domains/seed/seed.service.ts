@@ -20,7 +20,7 @@ export class SeedService {
     this.seedShirts();
   }
 
-  async getShirts() {
+  async getShirts(): Promise<ShirtSeed[]> {
     return await this.shirtSeedModel.find();
   }
 
@@ -28,7 +28,7 @@ export class SeedService {
     return await this.shirtSeedModel.findById(id);
   }
 
-  private async seedShirts() {
+  async seedShirts() {
     this.logger.debug(`Seeding shirts collection...`);
     try {
       await Promise.all(
