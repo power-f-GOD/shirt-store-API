@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 
 import { BaseQueryDto } from 'src/shared/dtos';
 import { UtilsService } from 'src/shared/services';
-import { ShirtSeed } from '../seed/schemas';
 import { SeedService } from '../seed/seed.service';
 import { CreateOrderItemDto } from './dtos';
 import { CreateOrderDto } from './dtos/create-order.dto';
@@ -14,18 +13,11 @@ import { Order, OrderDocument } from './schemas';
 
 @Injectable()
 export class OrdersService {
-  private shirtSeeds: Map<string, ShirtSeed> = new Map();
-
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    private seedService: SeedService,
+    private seeds: SeedService,
     private utils: UtilsService
-  ) {
-    (async () =>
-      (await this.seedService.getShirts()).map((shirt) => {
-        this.shirtSeeds.set(shirt.name, shirt);
-      }))();
-  }
+  ) {}
 
   create(createOrderDto: CreateOrderDto): Promise<Order> {
     const order = new this.orderModel(createOrderDto);
@@ -62,7 +54,7 @@ export class OrdersService {
     let itemCount = 0;
 
     for (const name in items) {
-      const shirtSeed = this.shirtSeeds.get(name);
+      const shirtSeed = this.seeds.shirts.get(name);
       const item = items[name];
 
       if (!shirtSeed) throw new Error(`Invalid shirt, "${name}".`);

@@ -8,12 +8,19 @@ import { shirtSeeds } from './data';
 
 @Injectable()
 export class SeedService {
+  shirts: Map<string, ShirtSeed> = new Map();
+
   constructor(
     @InjectModel(ShirtSeed.name)
     private shirtSeedModel: Model<ShirtSeedDocument>,
     private logger: LoggerService
   ) {
     this.logger.setContext(SeedService.name);
+    // Create an in-memory store, so we don't have to query DB always for static data, hence speed up get-s
+    (async () =>
+      (await this.getShirts()).map((shirt) => {
+        this.shirts.set(shirt.name, shirt);
+      }))();
   }
 
   seed() {
