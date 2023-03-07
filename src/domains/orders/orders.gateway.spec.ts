@@ -44,6 +44,10 @@ describe('OrdersGateway', () => {
     gateway = module.get<OrdersGateway>(OrdersGateway);
   });
 
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(gateway).toBeDefined();
   });

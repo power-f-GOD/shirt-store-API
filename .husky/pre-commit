@@ -2,4 +2,4 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # yarn type-check && yarn lint .
-yarn type-check && yarn lint-staged
+yarn type-check && pnpm test && yarn lint-staged

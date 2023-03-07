@@ -38,4 +38,11 @@ export class OrderModelMock {
       exec: jest.fn(() => [this.mockOrder].find((order) => order._id === id))
     };
   }
+
+  findOne(id: string) {
+    return {
+      ...this.find(),
+      exec: jest.fn(() => [this.mockOrder].find((order) => order._id === id))
+    };
+  }
 }

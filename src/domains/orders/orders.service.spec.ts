@@ -44,6 +44,10 @@ describe('OrdersService', () => {
     seedService = module.get<SeedService>(SeedService);
   });
 
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
@@ -64,6 +68,12 @@ describe('OrdersService', () => {
       expect(model.create).toHaveBeenCalledWith(payload);
       expect(await service.create(payload)).toStrictEqual(mockOrder);
     });
+
+    it('should reject if the correct payload is not passed in', async () => {
+      await expect(async () => {
+        await service.create({} as any);
+      }).rejects.toBeTruthy();
+    });
   });
 
   describe('getAll', () => {
@@ -75,6 +85,10 @@ describe('OrdersService', () => {
   describe('findOne', () => {
     it('should return an Order if found', async () => {
       expect(await service.findOne('string')).toStrictEqual(mockOrder);
+    });
+
+    it('should return `null` or `undefined` if found none', async () => {
+      expect(await service.findOne('')).toBeFalsy();
     });
   });
 
@@ -99,6 +113,13 @@ describe('OrdersService', () => {
         cost: 334.4,
         discount: 0.071
       });
+    });
+
+    it('should throw/reject if incorrect data is passed in', async () => {
+      await seedService.seed();
+      await expect(
+        async () => await service.computeDiscount({ Givench: { count: 9 } })
+      ).rejects.toStrictEqual(new Error('Invalid shirt, "Givench".'));
     });
   });
 });
