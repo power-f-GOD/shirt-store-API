@@ -2,11 +2,12 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { SharedModule } from 'src/shared/shared.module';
+import { ShirtSeedModelMock } from './mocks';
 import { ShirtSeed } from './schemas';
 import { SeedService } from './seed.service';
 
 describe('SeedService', () => {
-  const findResult: ShirtSeed[] = [
+  const shirtSeeds: ShirtSeed[] = [
     {
       image_url: 'string',
       name: 'string',
@@ -24,11 +25,7 @@ describe('SeedService', () => {
         SeedService,
         {
           provide: getModelToken(ShirtSeed.name),
-          useValue: {
-            async find() {
-              return findResult;
-            }
-          }
+          useClass: ShirtSeedModelMock
         }
       ]
     }).compile();
@@ -44,20 +41,16 @@ describe('SeedService', () => {
     it('should return an array of shirt (seeds)', async () => {
       jest
         .spyOn(service, 'getShirts')
-        .mockImplementation(() => Promise.resolve(findResult));
-      expect(await service.getShirts()).toStrictEqual(findResult);
+        .mockImplementation(() => Promise.resolve(shirtSeeds));
+      expect(await service.getShirts()).toStrictEqual(shirtSeeds);
     });
   });
 
   describe('seed', () => {
     it('should trigger `seedShirts`', async () => {
-      jest
-        .spyOn(service, 'seedShirts')
-        .mockImplementation(() => Promise.resolve(undefined));
-      jest.spyOn(service, 'seed').mockImplementation(() => {
-        service.seedShirts();
-      });
-      service.seed();
+      jest.spyOn(service, 'seedShirts');
+      jest.spyOn(service, 'seed');
+      await service.seed();
       expect(service.seed).toHaveReturned();
       expect(service.seedShirts).toHaveReturned();
     });

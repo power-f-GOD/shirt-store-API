@@ -16,15 +16,14 @@ export class SeedService {
     private logger: LoggerService
   ) {
     this.logger.setContext(SeedService.name);
-    // Create an in-memory store, so we don't have to query DB always for static data, hence speed up get-s
-    (async () =>
-      (await this.getShirts()).map((shirt) => {
-        this.shirts.set(shirt.name, shirt);
-      }))();
   }
 
-  seed() {
+  async seed() {
     this.seedShirts();
+    // Create an in-memory store, so we don't have to query DB always for static data, hence speed up get-s
+    (await this.getShirts()).map((shirt) => {
+      this.shirts.set(shirt.name, shirt);
+    });
   }
 
   async getShirts(): Promise<ShirtSeed[]> {
@@ -43,11 +42,11 @@ export class SeedService {
           const existingShirt = await this.shirtSeedModel.findOne({
             name: shirtSeed.name
           });
-          const shirt = new this.shirtSeedModel(shirtSeed);
+          const shirt =
+            existingShirt || (await this.shirtSeedModel.create(shirtSeed));
 
           shirt.isNew = !existingShirt;
-          if (existingShirt) shirt._id = existingShirt._id;
-          await shirt.save();
+          await shirt.save?.();
         })
       );
       this.logger.debug(`Finished seeding shirts collection.`);

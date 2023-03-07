@@ -1,6 +1,7 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { request as req, Request } from 'express';
+import { Model } from 'mongoose';
 
 import { SharedModule } from 'src/shared/shared.module';
 import { Order } from './schemas';
@@ -8,14 +9,15 @@ import { OrdersService } from './orders.service';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { SeedService } from '../seed/seed.service';
 import { ShirtSeed } from '../seed/schemas';
-import { Model } from 'mongoose';
-import { CreateOrderDto } from './dtos';
 import { mockOrder, mockQuery, mockUser, OrderModelMock } from './mocks';
+import { createOrderDtosMock, ShirtSeedModelMock } from '../seed/mocks';
+import { CreateOrderDto } from './dtos';
 
 describe('OrdersService', () => {
   const request = req as Request<any, any, any, BaseQueryDto>;
   let service: OrdersService;
   let model: Model<Order>;
+  let seedService: SeedService;
 
   request.user = mockUser;
   request.query = mockQuery;
@@ -28,11 +30,7 @@ describe('OrdersService', () => {
         SeedService,
         {
           provide: getModelToken(ShirtSeed.name),
-          useValue: {
-            async find() {
-              return [];
-            }
-          }
+          useClass: ShirtSeedModelMock
         },
         {
           provide: getModelToken(Order.name),
@@ -43,6 +41,7 @@ describe('OrdersService', () => {
 
     service = module.get<OrdersService>(OrdersService);
     model = module.get<Model<Order>>(getModelToken(Order.name));
+    seedService = module.get<SeedService>(SeedService);
   });
 
   it('should be defined', () => {
@@ -76,6 +75,30 @@ describe('OrdersService', () => {
   describe('findOne', () => {
     it('should return an Order if found', async () => {
       expect(await service.findOne('string')).toStrictEqual(mockOrder);
+    });
+  });
+
+  describe('computeDiscount', () => {
+    it(`should return a partial Order object with correct values: {
+        actual_cost: number,
+        cost: number,
+        discount: number
+      }. See the logs above to see the possible discounted costs.`, async () => {
+      await seedService.seed();
+      expect(
+        await service.computeDiscount(createOrderDtosMock[0].items)
+      ).toStrictEqual<Awaited<ReturnType<typeof service.computeDiscount>>>({
+        actual_cost: 64.0,
+        cost: 53.6,
+        discount: 0.162
+      });
+      expect(
+        await service.computeDiscount(createOrderDtosMock[1].items)
+      ).toStrictEqual<Awaited<ReturnType<typeof service.computeDiscount>>>({
+        actual_cost: 360,
+        cost: 334.4,
+        discount: 0.071
+      });
     });
   });
 });
