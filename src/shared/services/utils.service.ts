@@ -9,6 +9,7 @@ export class UtilsService {
       ...options
     }).format(number);
   }
+
   prettify = <T = any>(object: T) => {
     try {
       return JSON.stringify(object, null, 2);

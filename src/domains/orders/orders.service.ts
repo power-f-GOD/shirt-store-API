@@ -103,21 +103,19 @@ export class OrdersService {
   ) {
     if (items.length < 2) return Promise.resolve(actualCost);
 
+    const price = items[0].price!;
     let restItemCount = 0;
-    let price = 8;
+    let discountedCost = 0;
     const itemCounts = items.map((item) => {
       restItemCount += item.count;
-      price = item.price!;
       return item.count;
     });
 
-    let discountedCost = 0;
-
-    while (itemCounts.length > 0) {
+    while (itemCounts.length) {
       let lim = itemCounts.length - 1;
       let groupCount = 0;
 
-      // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same)
+      // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same always)
       if (lim < 1) break;
 
       for (let i = 0; i <= lim; i++) {
@@ -127,7 +125,7 @@ export class OrdersService {
         if (itemCounts[i]) {
           groupCount++;
           itemCounts[i]--;
-          restItemCount--; // This is crucial in calculating the cost of the rest shirts (belonging to 1 group of 1 shirt type/kind)
+          restItemCount--; // This is crucial in calculating the cost of the rest shirts (which will all belong to 1 group of 1 shirt type/kind)
         }
 
         if (itemCounts[i] < 1) {
@@ -161,12 +159,12 @@ export class OrdersService {
     if (items.length < 2) return Promise.resolve(actualCost);
 
     let restItemCount = 0;
-    let price = 8;
+    const price = items[0].price!;
     let maxSingleItemCount = -Infinity;
+    let discountedCost = 0;
     const sortedItemCounts = items
       .map((item) => {
         restItemCount += item.count;
-        price = item.price!;
         return item.count;
       })
       .sort((a, b) => {
@@ -174,13 +172,12 @@ export class OrdersService {
         return b - a;
       });
     const maxGroupable = Math.round(itemCount / maxSingleItemCount);
-    let discountedCost = 0;
 
-    while (sortedItemCounts.length > 0) {
+    while (sortedItemCounts.length) {
       let lim = maxGroupable - 1;
       let groupCount = 0;
 
-      // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same)
+      // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same always)
       if (sortedItemCounts.length < 2) break;
 
       for (let i = 0; i <= lim; i++) {
@@ -190,7 +187,7 @@ export class OrdersService {
         if (sortedItemCounts[i]) {
           groupCount++;
           sortedItemCounts[i]--;
-          restItemCount--; // This is crucial in calculating the cost of the rest shirts (belonging to 1 group of 1 shirt type/kind)
+          restItemCount--; // This is crucial in calculating the cost of the rest shirts (which will all belong to 1 group of 1 shirt type/kind)
         }
 
         if (sortedItemCounts[i] < 1) {
@@ -203,9 +200,7 @@ export class OrdersService {
 
       discountedCost +=
         groupCount > 1
-          ? groupCount *
-            price *
-            (1 - this.getDiscountPerGroupCount(groupCount)!)
+          ? groupCount * price * (1 - this.getDiscountPerGroupCount(groupCount))
           : 0;
     }
 

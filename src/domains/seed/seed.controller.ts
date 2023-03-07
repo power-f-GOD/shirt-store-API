@@ -23,7 +23,7 @@ export class SeedController {
   @ApiFoundResponse({ type: ShirtSeed, isArray: true })
   @Get('/shirts')
   async getShirts() {
-    this.logger.debug('Getting all order item cost weights...');
+    this.logger.debug('Getting all shirts sold (or available)...');
 
     const shirts = await this.seedService.getShirts();
 

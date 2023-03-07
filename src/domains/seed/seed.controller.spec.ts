@@ -2,22 +2,13 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { SharedModule } from 'src/shared/shared.module';
+import { ShirtSeedModelMock, shirtSeedsMock } from './mocks';
 import { ShirtSeed } from './schemas';
 import { SeedController } from './seed.controller';
 import { SeedService } from './seed.service';
 
 describe('SeedController', () => {
-  const findResult: ShirtSeed[] = [
-    {
-      image_url: 'string',
-      name: 'string',
-      price: 0,
-      _id: 'string'
-    }
-  ];
-
   let controller: SeedController;
-  let service: SeedService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,17 +18,12 @@ describe('SeedController', () => {
         SeedService,
         {
           provide: getModelToken(ShirtSeed.name),
-          useValue: {
-            async find() {
-              return findResult;
-            }
-          }
+          useClass: ShirtSeedModelMock
         }
       ]
     }).compile();
 
     controller = module.get<SeedController>(SeedController);
-    service = module.get<SeedService>(SeedService);
   });
 
   afterAll(jest.clearAllMocks);
@@ -48,11 +34,8 @@ describe('SeedController', () => {
 
   describe('getShirts', () => {
     it('should return a (normalized) response object with an array of shirt (seeds)', async () => {
-      jest
-        .spyOn(service, 'getShirts')
-        .mockImplementation(() => Promise.resolve(findResult));
       expect(await controller.getShirts()).toStrictEqual({
-        data: findResult,
+        data: shirtSeedsMock,
         path: undefined
       });
     });
