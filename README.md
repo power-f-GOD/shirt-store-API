@@ -44,7 +44,6 @@ The following environment variables need to be set in a `.env` file:
 
 - `HOST`: The hostname or IP address that the server will listen on
 - `PORT`: The port that the server will run on
-- `WS_PORT`: The port number that the WebSocket \[Socket.io\] server will listen on
 - `MONGODB_PORT`: The port number of the MongoDB database
 - `MONGODB_NAME`: The database name of the MongoDB database
 - `MONGODB_URI`: The URI for connecting to the MongoDB database
@@ -55,13 +54,13 @@ The REST API endpoints can be accessed through `http://${HOST}:${PORT}/api`.
 
 For the (REST API) documentation, navigate to (the Swagger API documentation at) `http://${HOST}:${PORT}/api` in your browser.
 
-The WebSocket Gateway documentation is coming soon!
+The WebSocket Gateway documentation is coming soon!😌
 
 ## Tests
 
 The project uses [Jest](https://jestjs.io/) as the test runner/framework.
 
-To run the tests, simply run the following command:
+To run the tests, simply run:
 
 ```zsh
 pm test
