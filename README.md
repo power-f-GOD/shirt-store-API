@@ -57,6 +57,18 @@ For the (REST API) documentation, navigate to (the Swagger API documentation at)
 
 The WebSocket Gateway documentation is coming soon!
 
+## Tests
+
+The project uses [Jest](https://jestjs.io/) as the test runner/framework.
+
+To run the tests, simply run the following command:
+
+```zsh
+pm test
+```
+
+See `package.json` for the rest test scripts.
+
 ## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
