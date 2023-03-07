@@ -59,6 +59,7 @@ export class OrdersService {
   ): Promise<Omit<Required<CreateOrderDto>, 'items'>> {
     const itemsToArray: CreateOrderItemDto[] = [];
     let actual_cost = 0;
+    let itemCount = 0;
 
     for (const name in items) {
       const shirtSeed = this.shirtSeeds.get(name);
@@ -68,41 +69,46 @@ export class OrdersService {
 
       if (item.count) {
         itemsToArray.push({ count: item.count, price: shirtSeed.price });
+        itemCount += item.count;
       }
 
       actual_cost += shirtSeed.price * item.count;
     }
 
-    const [firstDiscountedCost] = await Promise.all([
-      this.computeDiscountedCostFirstWay(itemsToArray, actual_cost)
+    const [firstDiscountedCost, secondDiscountedCost] = await Promise.all([
+      this.computeDiscountedCostFirstWay(itemsToArray, actual_cost),
+      this.computeDiscountedCostSecondWay(itemsToArray, actual_cost, itemCount)
     ]);
+    const lowestPossibleCost = Math.min(
+      firstDiscountedCost,
+      secondDiscountedCost
+    );
 
-    console.log({ firstDiscountedCost, actual_cost });
-    // console.log({ itemsToArray });
+    console.log({ firstDiscountedCost, secondDiscountedCost, actual_cost });
 
     return {
       discount: +this.utils.formatNumber(
-        (actual_cost - firstDiscountedCost) / actual_cost,
+        (actual_cost - lowestPossibleCost) / actual_cost,
         { maximumFractionDigits: 3 }
       ),
       actual_cost,
-      cost: firstDiscountedCost
+      cost: lowestPossibleCost
     };
   }
 
   private computeDiscountedCostFirstWay(
-    _items: CreateOrderItemDto[],
-    actual_cost: number
+    items: CreateOrderItemDto[],
+    actualCost: number
   ) {
+    if (items.length < 2) return Promise.resolve(actualCost);
+
     let restItemCount = 0;
     let price = 8;
-    const itemCounts = _items.map((item) => {
+    const itemCounts = items.map((item) => {
       restItemCount += item.count;
       price = item.price!;
       return item.count;
     });
-
-    if (itemCounts.length < 2) return Promise.resolve(actual_cost);
 
     let discountedCost = 0;
 
@@ -131,24 +137,81 @@ export class OrdersService {
         }
       }
 
-      // console.log({
-      //   lim,
-      //   count,
-      //   itemCount: restItemCount,
-      //   counts: itemCounts.length
-      // });
-
-      discountedCost += groupCount
-        ? groupCount * price! * (1 - this.getDiscountPerGroupCount(groupCount)!)
-        : 0;
+      discountedCost +=
+        groupCount > 1
+          ? groupCount *
+            price *
+            (1 - this.getDiscountPerGroupCount(groupCount)!)
+          : 0;
     }
 
     discountedCost += restItemCount * price;
 
-    // console.log({ discountedCost });
+    return Promise.resolve(
+      +this.utils.formatNumber(discountedCost || actualCost)
+    );
+  }
+
+  private computeDiscountedCostSecondWay(
+    items: CreateOrderItemDto[],
+    actualCost: number,
+    itemCount: number
+  ) {
+    if (items.length < 2) return Promise.resolve(actualCost);
+
+    let restItemCount = 0;
+    let price = 8;
+    let maxSingleItemCount = -Infinity;
+    const sortedItemCounts = items
+      .map((item) => {
+        restItemCount += item.count;
+        price = item.price!;
+        return item.count;
+      })
+      .sort((a, b) => {
+        if (a > maxSingleItemCount) maxSingleItemCount = a;
+        return b - a;
+      });
+    const maxGroupable = Math.round(itemCount / maxSingleItemCount);
+    let discountedCost = 0;
+
+    while (sortedItemCounts.length > 0) {
+      let lim = maxGroupable - 1;
+      let groupCount = 0;
+
+      // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same)
+      if (lim < 1) break;
+
+      for (let i = 0; i <= lim; i++) {
+        // At this point, it's safe to say we've exhausted the list, hence do not proceed
+        if (sortedItemCounts[i] === undefined) break;
+
+        if (sortedItemCounts[i]) {
+          groupCount++;
+          sortedItemCounts[i]--;
+          restItemCount--; // This is crucial in calculating the cost of the rest shirts (belonging to 1 group of 1 shirt type/kind)
+        }
+
+        if (sortedItemCounts[i] < 1) {
+          sortedItemCounts.splice(i, 1);
+          // We don't want to skip/miss any `itemCount` at index, hence these lines
+          i--;
+          lim--;
+        }
+      }
+
+      discountedCost +=
+        groupCount > 1
+          ? groupCount *
+            price *
+            (1 - this.getDiscountPerGroupCount(groupCount)!)
+          : 0;
+    }
+
+    discountedCost += restItemCount * price;
 
     return Promise.resolve(
-      +this.utils.formatNumber(discountedCost || actual_cost)
+      +this.utils.formatNumber(discountedCost || actualCost)
     );
   }
 
