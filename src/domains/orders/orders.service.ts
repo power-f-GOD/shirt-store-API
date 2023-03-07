@@ -80,7 +80,8 @@ export class OrdersService {
       firstDiscountedCost,
       secondDiscountedCost,
       lowestPossibleDiscountedCost,
-      actual_cost
+      actual_cost,
+      itemsToArray
     });
 
     return {
@@ -177,7 +178,7 @@ export class OrdersService {
       let groupCount = 0;
 
       // We don't want to keep the loop running redundantly (since we know that one group of one shirt will cost the same)
-      if (lim < 1) break;
+      if (sortedItemCounts.length < 2) break;
 
       for (let i = 0; i <= lim; i++) {
         // At this point, it's safe to say we've exhausted the list, hence do not proceed
