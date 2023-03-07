@@ -40,12 +40,12 @@ describe('SeedController', () => {
     service = module.get<SeedService>(SeedService);
   });
 
-  describe('getShirts', () => {
-    it('should be defined', () => {
-      expect(controller).toBeDefined();
-    });
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
 
-    it('should return a response object with an array of shirt (seeds)', async () => {
+  describe('getShirts', () => {
+    it('should return a (normalized) response object with an array of shirt (seeds)', async () => {
       jest
         .spyOn(service, 'getShirts')
         .mockImplementation(() => Promise.resolve(findResult));

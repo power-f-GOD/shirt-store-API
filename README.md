@@ -4,27 +4,37 @@ API for Shirt Store UI built with [NodeJS](https://nodejs.org/) and the [NestJS]
 
 ## Installation
 
-1. Clone the repository and navigate into it:
+1. Install and set up Mongo DB locally ([on Mac](https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#setting-up-mongodb-on-macos) or [on Windows](https://www.prisma.io/dataguide/mongodb/setting-up-a-local-mongodb-database#setting-up-mongodb-on-windows)).
 
-```zsh
-git clone https://github.com/power-f-GOD/shirt-store-API.git && cd shirt-store-api
-```
+2. Clone the repository and navigate into it:
 
-2. Install dependencies:
+   ```zsh
+   git clone https://github.com/power-f-GOD/shirt-store-API.git && cd shirt-store-api
+   ```
 
-```zsh
-npm i -g pnpm && pnpm i
-```
+3. Install dependencies:
 
-3. Create a `.env` file with the required environment variables. (See the [Environment Variables](#environment-variables) section)
+   ```zsh
+   npm i -g pnpm && pnpm i
+   ```
 
-`Hint`: Copy the contents of `.env.example`.
+4. Create a `.env` file with the required environment variables. (See the [Environment Variables](#environment-variables) section)
 
-4. Start the server:
+   `Hint:` Copy the contents of `.env.example`.
 
-```zsh
-pm start:dev
-```
+5. Start the Mongo Daemon \[Server\] (in one terminal):
+
+   ```zsh
+   mongod
+   ```
+
+`Sidebar:` In a case where the Mongo server doesn't start up, you may want to check that you have a `/data/db/` directory created somewhere in your PC's `Users/<user_name>/` directory. Also, inspect the logs to see the causal error(s).
+
+4. Start the server (in another terminal):
+
+   ```zsh
+   pm start:dev
+   ```
 
 `Sidebar:` You can set an alias for `pnpm` in your `.zshrc` (on Mac) or `.bashrc` file by including this line `alias pm=pnpm` therein.
 
@@ -43,9 +53,9 @@ The following environment variables need to be set in a `.env` file:
 
 The REST API endpoints can be accessed through `http://${HOST}:${PORT}/api`.
 
-For the REST API documentation, navigate to (the Swagger API documentation at) `http://${HOST}:${PORT}/api` in your browser.
+For the (REST API) documentation, navigate to (the Swagger API documentation at) `http://${HOST}:${PORT}/api` in your browser.
 
-The WebSocket Gateway documentation is coming soon!.
+The WebSocket Gateway documentation is coming soon!
 
 ## Contributing
 
