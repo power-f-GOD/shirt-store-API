@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# yarn type-check && yarn lint .
-yarn type-check && pnpm test && yarn lint-staged
+# pnpm lint .
+pnpm type-check && pnpm test && pnpm lint-staged
