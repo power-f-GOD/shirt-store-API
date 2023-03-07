@@ -65,9 +65,7 @@ describe('OrdersController', () => {
     service = module.get<OrdersService>(OrdersService);
   });
 
-  afterAll(() => {
-    jest.clearAllMocks();
-  });
+  afterAll(jest.clearAllMocks);
 
   it('should be defined', () => {
     expect(controller).toBeDefined();

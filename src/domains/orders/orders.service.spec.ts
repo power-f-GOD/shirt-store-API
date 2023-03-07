@@ -9,7 +9,7 @@ import { OrdersService } from './orders.service';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { SeedService } from '../seed/seed.service';
 import { ShirtSeed } from '../seed/schemas';
-import { mockOrder, mockQuery, mockUser, OrderModelMock } from './mocks';
+import { orderMock, queryMock, userMock, OrderModelMock } from './mocks';
 import { createOrderDtosMock, ShirtSeedModelMock } from '../seed/mocks';
 import { CreateOrderDto } from './dtos';
 
@@ -19,8 +19,8 @@ describe('OrdersService', () => {
   let model: Model<Order>;
   let seedService: SeedService;
 
-  request.user = mockUser;
-  request.query = mockQuery;
+  request.user = userMock;
+  request.query = queryMock;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +34,7 @@ describe('OrdersService', () => {
         },
         {
           provide: getModelToken(Order.name),
-          useValue: new OrderModelMock(mockOrder)
+          useValue: new OrderModelMock(orderMock)
         }
       ]
     }).compile();
@@ -44,9 +44,7 @@ describe('OrdersService', () => {
     seedService = module.get<SeedService>(SeedService);
   });
 
-  afterAll(() => {
-    jest.clearAllMocks();
-  });
+  afterAll(jest.clearAllMocks);
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -59,14 +57,14 @@ describe('OrdersService', () => {
       };
       const order = await service.create(payload);
 
-      expect(order).toStrictEqual(mockOrder);
+      expect(order).toStrictEqual(orderMock);
       expect(order.items[0]).toStrictEqual({
-        ...mockOrder.items[0],
+        ...orderMock.items[0],
         ...payload.items['[item_name]'],
         name: '[item_name]'
       });
       expect(model.create).toHaveBeenCalledWith(payload);
-      expect(await service.create(payload)).toStrictEqual(mockOrder);
+      expect(await service.create(payload)).toStrictEqual(orderMock);
     });
 
     it('should reject if the correct payload is not passed in', async () => {
@@ -78,13 +76,13 @@ describe('OrdersService', () => {
 
   describe('getAll', () => {
     it('should return an array of orders', async () => {
-      expect(await service.getAll(request)).toStrictEqual(mockOrder);
+      expect(await service.getAll(request)).toStrictEqual(orderMock);
     });
   });
 
   describe('findOne', () => {
     it('should return an Order if found', async () => {
-      expect(await service.findOne('string')).toStrictEqual(mockOrder);
+      expect(await service.findOne('string')).toStrictEqual(orderMock);
     });
 
     it('should return `null` or `undefined` if found none', async () => {

@@ -33,6 +33,8 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
+  afterAll(jest.clearAllMocks);
+
   describe('root', () => {
     it('should return Hello! Shirt Store! object', () => {
       expect(appController.getHello()).toStrictEqual({

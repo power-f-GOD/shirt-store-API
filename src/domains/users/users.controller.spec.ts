@@ -27,6 +27,8 @@ describe('UsersController', () => {
     controller = module.get<UsersController>(UsersController);
   });
 
+  afterAll(jest.clearAllMocks);
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });

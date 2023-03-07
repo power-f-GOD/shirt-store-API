@@ -33,6 +33,8 @@ describe('AppGateway', () => {
     gateway = module.get<AppGateway>(AppGateway);
   });
 
+  afterAll(jest.clearAllMocks);
+
   it('should be defined', () => {
     expect(gateway).toBeDefined();
   });

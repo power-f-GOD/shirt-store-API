@@ -21,6 +21,8 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
   });
 
+  afterAll(jest.clearAllMocks);
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

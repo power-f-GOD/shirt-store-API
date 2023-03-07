@@ -3,7 +3,7 @@ import { User } from 'src/domains/users/schemas';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { Order } from '../schemas';
 
-export const mockOrder: Order = {
+export const orderMock: Order = {
   _id: 'string',
   actual_cost: 0,
   cost: 0,
@@ -14,14 +14,14 @@ export const mockOrder: Order = {
   updated_at: 'string'
 };
 
-export const mockUser: User = {
+export const userMock: User = {
   name: 'string',
   _id: 'string',
   authenticated: false,
   created_at: 'string'
 };
 
-export const mockQuery: Request<any, any, any, BaseQueryDto>['query'] = {
+export const queryMock: Request<any, any, any, BaseQueryDto>['query'] = {
   count: 1,
   skip: 0
 };

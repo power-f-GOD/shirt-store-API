@@ -6,7 +6,7 @@ import { ShirtSeed } from '../seed/schemas';
 import { SeedService } from '../seed/seed.service';
 import { User } from '../users/schemas';
 import { UsersService } from '../users/users.service';
-import { OrderModelMock, mockOrder } from './mocks';
+import { OrderModelMock, orderMock } from './mocks';
 import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
 import { Order } from './schemas';
@@ -24,7 +24,7 @@ describe('OrdersGateway', () => {
         SeedService,
         {
           provide: getModelToken(Order.name),
-          useValue: new OrderModelMock(mockOrder)
+          useValue: new OrderModelMock(orderMock)
         },
         {
           provide: getModelToken(User.name),
@@ -44,9 +44,7 @@ describe('OrdersGateway', () => {
     gateway = module.get<OrdersGateway>(OrdersGateway);
   });
 
-  afterAll(() => {
-    jest.clearAllMocks();
-  });
+  afterAll(jest.clearAllMocks);
 
   it('should be defined', () => {
     expect(gateway).toBeDefined();

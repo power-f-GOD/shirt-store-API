@@ -40,6 +40,8 @@ describe('SeedController', () => {
     service = module.get<SeedService>(SeedService);
   });
 
+  afterAll(jest.clearAllMocks);
+
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
