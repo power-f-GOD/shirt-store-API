@@ -9,7 +9,8 @@ export type UserDocument = HydratedDocument<User>;
 @ApiTags(AppDomainNamesEnum.USERS)
 @Schema({
   timestamps: {
-    createdAt: 'created_at'
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   }
 })
 export class User {
@@ -23,6 +24,11 @@ export class User {
   @ApiProperty({ type: Date })
   created_at?: string;
 
+  @ApiProperty({ type: Date })
+  updated_at?: string;
+
+  @ApiProperty({ type: Boolean })
+  @Prop({ type: Boolean })
   authenticated?: boolean;
 }
 

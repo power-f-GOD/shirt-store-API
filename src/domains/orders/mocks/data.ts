@@ -10,7 +10,7 @@ export const orderMock: Order = {
   created_at: 'string',
   discount: 0,
   item_count: 0,
-  items: [{ count: 0, name: '[item_name]', _id: 'string', price: 0 }],
+  items: [{ count: 0, name: 'Givenchy', _id: 'string', price: 0 }],
   updated_at: 'string'
 };
 

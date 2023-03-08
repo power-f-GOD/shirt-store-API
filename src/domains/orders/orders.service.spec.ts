@@ -53,17 +53,24 @@ describe('OrdersService', () => {
   describe('create', () => {
     it('should create an order and return an Order object', async () => {
       const payload: CreateOrderDto = {
-        items: { '[item_name]': { count: 0 } }
+        items: { Givenchy: { count: 0 } }
       };
+      await seedService.seed();
       const order = await service.create(payload);
 
+      expect(model.create).toHaveBeenCalledWith({
+        ...payload,
+        items: Object.entries(payload.items).map(([name, props]) => ({
+          name,
+          ...props
+        }))
+      });
       expect(order).toStrictEqual(orderMock);
       expect(order.items[0]).toStrictEqual({
         ...orderMock.items[0],
-        ...payload.items['[item_name]'],
-        name: '[item_name]'
+        ...payload.items['Givenchy'],
+        name: 'Givenchy'
       });
-      expect(model.create).toHaveBeenCalledWith(payload);
       expect(await service.create(payload)).toStrictEqual(orderMock);
     });
 

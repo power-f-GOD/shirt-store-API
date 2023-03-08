@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Req,
+  UseGuards
+} from '@nestjs/common';
 import { Request } from 'express';
 import {
   ApiBadRequestResponse,
@@ -21,8 +29,11 @@ import {
 import { BaseQueryDto, ErrorResponseDto } from 'src/shared/dtos';
 import { Order } from './schemas';
 import { AppDomainNamesEnum } from 'src/enums';
+import { AuthenticatedGuard } from 'src/shared/guards';
+import { User } from '../users/schemas';
 
 @ApiTags(AppDomainNamesEnum.ORDERS)
+@UseGuards(AuthenticatedGuard)
 @Controller(AppDomainNamesEnum.ORDERS)
 export class OrdersController {
   constructor(
@@ -40,7 +51,7 @@ export class OrdersController {
   async create(@Body() body: CreateOrderDto, @Req() request: Request) {
     this.logger.debug(
       `Creating order for user, "${
-        request.user.name
+        request.user?.name
       }", with payload: ${this.utils.prettify(body)}...`
     );
 
@@ -57,7 +68,7 @@ export class OrdersController {
   @ApiQuery({ type: BaseQueryDto })
   @Get()
   async getAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
-    this.logger.debug(`Getting orders for user, ${request.user.name}...`);
+    this.logger.debug(`Getting orders for user, ${request.user?.name}...`);
 
     try {
       return this.response.success(await this.ordersService.getAll(request));
@@ -68,14 +79,14 @@ export class OrdersController {
   }
 
   @ApiOperation({
-    summary: 'Get an order (by `id`) belonging to `request` user.'
+    summary: 'Authenticate user.'
   })
-  @ApiFoundResponse({ type: Order })
+  @ApiFoundResponse({ type: User })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: Request) {
     this.logger.debug(
-      `Getting order with id, ${id}, for user, ${request.user.name}...`
+      `Getting order with id, ${id}, for user, ${request.user?.name}...`
     );
 
     try {
@@ -85,14 +96,4 @@ export class OrdersController {
       return this.response.error(e.message || e);
     }
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-  //   return this.ordersService.update(+id, updateOrderDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.ordersService.remove(+id);
-  // }
 }

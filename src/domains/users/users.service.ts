@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { CreateUserDto } from './dtos/create-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
 import { User, UserDocument } from './schemas';
 
 @Injectable()
@@ -11,22 +10,20 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = new this.userModel(createUserDto);
+    const isExisting = !!(await this.userModel.findOne({
+      name: createUserDto.name
+    }));
 
-    return await user.save();
+    if (isExisting) throw new Error('User already exists!');
+
+    return await this.userModel.create({
+      ...createUserDto,
+      authenticated: true
+    });
   }
 
   async getOne(name: string) {
-    return await this.userModel.findOne({ name }).exec();
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log(updateUserDto);
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return await this.userModel.findOne({ name });
   }
 
   /** This is just for to mock authentication. In the real world, this should be done in an `AuthService`. */
@@ -36,5 +33,17 @@ export class UsersService {
     if (user) return user;
 
     throw new Error('Please, authenticate.');
+  }
+
+  async authenticate(name: string, type: 'login' | 'logout') {
+    const user = await this.userModel.findOne({ name });
+
+    if (user) {
+      user.authenticated = type !== 'logout';
+      await user.save();
+      return user;
+    }
+
+    throw new Error('Record not found.');
   }
 }

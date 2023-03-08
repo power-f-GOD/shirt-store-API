@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException
 } from '@nestjs/common';
+import { getSchemaPath } from '@nestjs/swagger';
 
 @Injectable()
 export class NormalizeResponseService {
@@ -39,5 +40,11 @@ export class NormalizeResponseService {
         ? new ExceptionClass(errorMessage)
         : new BadRequestException(errorMessage)
       : new InternalServerErrorException(errorMessage);
+  }
+
+  static getSuccessSchema(Schema: new () => any) {
+    return {
+      schema: { properties: { data: { $ref: getSchemaPath(Schema) } } }
+    };
   }
 }

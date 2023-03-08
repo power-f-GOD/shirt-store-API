@@ -20,7 +20,17 @@ export class OrdersService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = await this.orderModel.create(createOrderDto);
+    const itemsToArray = Object.entries(createOrderDto.items).map(
+      ([name, props]) => ({ ...props, name })
+    );
+
+    for (const item of itemsToArray) {
+      if (!this.seeds.shirts.get(item.name)) {
+        throw new Error(`Invalid item, "${item.name}".`);
+      }
+    }
+
+    const order = await this.orderModel.create({ items: itemsToArray });
 
     return order;
   }

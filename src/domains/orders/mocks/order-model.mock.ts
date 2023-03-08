@@ -1,4 +1,3 @@
-import { CreateOrderDto } from '../dtos';
 import { Order } from '../schemas';
 
 export class OrderModelMock {
@@ -8,16 +7,12 @@ export class OrderModelMock {
     this.mockOrder = mockOrder;
   }
 
-  create = jest.fn((createOrderDto: CreateOrderDto) => {
-    const items: Partial<Order['items'][0]>[] = Object.keys(
-      createOrderDto.items
-    ).map((name, i) => ({
-      ...this.mockOrder.items[i],
-      name,
-      count: createOrderDto.items[name].count
-    }));
-
-    return { ...this.mockOrder, items };
+  create = jest.fn((order: Order) => {
+    return {
+      ...order,
+      ...this.mockOrder,
+      items: order.items.map((item) => ({ ...item, _id: 'string', price: 0 }))
+    };
   });
 
   find() {

@@ -1,5 +1,11 @@
-import { Controller, Get, Post, Body, Param, Req } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ConflictException
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -11,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dtos';
+import { AuthenticateUserDto, CreateUserDto } from './dtos';
 import {
   LoggerService,
   NormalizeResponseService,
@@ -36,25 +42,29 @@ export class UsersController {
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
   @Post()
-  async create(@Body() body: CreateUserDto, @Req() request: Request) {
+  async create(@Body() body: CreateUserDto) {
     this.logger.debug(
-      `Creating user for user, ${
-        request.user.name
-      }, with payload: ${this.utils.prettify(body)}...`
+      `Creating user for user with payload: ${this.utils.prettify(body)}...`
     );
 
     try {
       return this.response.success(await this.usersService.create(body));
     } catch (e: any) {
+      const isConflict = /exists/.test(e.message);
+
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      return this.response.error(
+        e,
+        e,
+        isConflict ? ConflictException : undefined
+      );
     }
   }
 
   @ApiOperation({
     summary: 'Get (existing) user (by `name`).'
   })
-  @ApiFoundResponse({ type: User })
+  @ApiFoundResponse(NormalizeResponseService.getSuccessSchema(User))
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Get(':name')
   async getOne(@Param('name') name: string) {
@@ -68,13 +78,23 @@ export class UsersController {
     }
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @ApiOperation({
+    summary: 'Authenticate user (by `name`).'
+  })
+  @ApiFoundResponse(NormalizeResponseService.getSuccessSchema(User))
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
+  @Post('authenticate')
+  /** This is just for to mock authentication. In the real world, this should be done in an `AuthController`. */
+  async authenticate(@Body() { name, type }: AuthenticateUserDto) {
+    this.logger.debug(`Authenticating user by name, ${name}...`);
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+    try {
+      return this.response.success(
+        await this.usersService.authenticate(name, type)
+      );
+    } catch (e: any) {
+      this.logger.error(e.message || e);
+      return this.response.error(e.message || e);
+    }
+  }
 }

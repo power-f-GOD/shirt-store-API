@@ -9,7 +9,7 @@ import { static as __static } from 'express';
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
-import { PORT } from './constants';
+import { PORT, HOST } from './constants';
 import { CreateOrderItemDto } from './domains/orders/dtos';
 
 const bootstrap = async () => {
@@ -35,10 +35,12 @@ const bootstrap = async () => {
 
   SwaggerModule.setup('api', app, document);
   await app.listen(PORT, () =>
-    setTimeout(
-      () => console.log(`Server listening on PORT=${PORT}, BTW.`),
-      1000
-    )
+    setTimeout(() => {
+      console.log(`\n\x1b[36mServer listening on PORT=${PORT}, BTW.😎\n`);
+      console.log(
+        `\x1b[34mFor the API documentation, navigate to http://${HOST}:${PORT}/api in your browser.✅`
+      );
+    }, 1000)
   );
 };
 
