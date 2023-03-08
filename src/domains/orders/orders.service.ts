@@ -187,7 +187,7 @@ export class OrdersService {
         if (a > maxSingleItemCount) maxSingleItemCount = a;
         return b - a;
       });
-    const maxGroupable = Math.round(itemCount / maxSingleItemCount);
+    const maxGroupable = Math.min(Math.ceil(itemCount / maxSingleItemCount), 5);
 
     while (sortedItemCounts.length) {
       let lim = maxGroupable - 1;
