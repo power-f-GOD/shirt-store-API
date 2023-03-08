@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { Order } from 'src/domains/orders/schemas';
 
 import { AppDomainNamesEnum } from 'src/enums';
 
@@ -19,7 +20,7 @@ export class User {
 
   @ApiProperty({ type: String })
   @Prop({ required: true, unique: true })
-  name: string;
+  username: string;
 
   @ApiProperty({ type: Date })
   created_at?: string;
@@ -30,6 +31,9 @@ export class User {
   @ApiProperty({ type: Boolean })
   @Prop({ type: Boolean })
   authenticated?: boolean;
+
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Order' }])
+  orders?: Order[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

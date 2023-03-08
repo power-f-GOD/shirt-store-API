@@ -4,14 +4,21 @@ import { request as req, Request } from 'express';
 import { Model } from 'mongoose';
 
 import { SharedModule } from 'src/shared/shared.module';
-import { Order } from './schemas';
+import { Order, OrderItem } from './schemas';
 import { OrdersService } from './orders.service';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { SeedService } from '../seed/seed.service';
 import { ShirtSeed } from '../seed/schemas';
-import { orderMock, queryMock, userMock, OrderModelMock } from './mocks';
+import {
+  orderMock,
+  queryMock,
+  userMock,
+  OrderModelMock,
+  orderItemMock
+} from './mocks';
 import { createOrderDtosMock, ShirtSeedModelMock } from '../seed/mocks';
 import { CreateOrderDto } from './dtos';
+import { OrderItemModelMock } from './mocks/order-item-model.mock';
 
 describe('OrdersService', () => {
   const request = req as Request<any, any, any, BaseQueryDto>;
@@ -35,6 +42,10 @@ describe('OrdersService', () => {
         {
           provide: getModelToken(Order.name),
           useValue: new OrderModelMock(orderMock)
+        },
+        {
+          provide: getModelToken(OrderItem.name),
+          useValue: new OrderItemModelMock(orderItemMock)
         }
       ]
     }).compile();
@@ -56,27 +67,23 @@ describe('OrdersService', () => {
         items: { Givenchy: { count: 0 } }
       };
       await seedService.seed();
-      const order = await service.create(payload);
+      const order = await service.create(payload, request.user);
 
       expect(model.create).toHaveBeenCalledWith({
         ...payload,
-        items: Object.entries(payload.items).map(([name, props]) => ({
-          name,
-          ...props
-        }))
+        items: order.items,
+        user: 'string'
       });
       expect(order).toStrictEqual(orderMock);
-      expect(order.items[0]).toStrictEqual({
-        ...orderMock.items[0],
-        ...payload.items['Givenchy'],
-        name: 'Givenchy'
-      });
-      expect(await service.create(payload)).toStrictEqual(orderMock);
+      expect(order.items[0]).toStrictEqual('string');
+      expect(await service.create(payload, request.user)).toStrictEqual(
+        orderMock
+      );
     });
 
     it('should reject if the correct payload is not passed in', async () => {
       await expect(async () => {
-        await service.create({} as any);
+        await service.create({} as any, request.user);
       }).rejects.toBeTruthy();
     });
   });

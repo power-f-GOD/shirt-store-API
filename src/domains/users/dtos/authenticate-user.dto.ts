@@ -5,12 +5,13 @@ import { CreateUserDto } from './create-user.dto';
 
 export class AuthenticateUserDto extends CreateUserDto {
   @ApiProperty({
-    enum: ['login', 'logout'],
+    enum: ['login', 'logout', 'signup'],
     enumName: 'type',
     description: "The type of authentication: 'login'|'logout'."
   })
-  @IsEnum(['login', 'logout'], {
-    message: "Authentication `type` must be one of 'login' or 'logout'."
+  @IsEnum(['login', 'logout', 'signup'], {
+    message:
+      "Authentication `type` must be one of 'login', 'logout' or 'signup'."
   })
-  type: 'login' | 'logout';
+  type: 'login' | 'logout' | 'signup';
 }

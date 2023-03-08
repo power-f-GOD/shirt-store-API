@@ -29,11 +29,10 @@ import {
 import { BaseQueryDto, ErrorResponseDto } from 'src/shared/dtos';
 import { Order } from './schemas';
 import { AppDomainNamesEnum } from 'src/enums';
-import { AuthenticatedGuard } from 'src/shared/guards';
-import { User } from '../users/schemas';
+import { CustomAuthGuard } from 'src/shared/guards';
 
 @ApiTags(AppDomainNamesEnum.ORDERS)
-@UseGuards(AuthenticatedGuard)
+@UseGuards(CustomAuthGuard)
 @Controller(AppDomainNamesEnum.ORDERS)
 export class OrdersController {
   constructor(
@@ -41,7 +40,9 @@ export class OrdersController {
     private response: NormalizeResponseService,
     private logger: LoggerService,
     private utils: UtilsService
-  ) {}
+  ) {
+    this.logger.setContext(OrdersController.name);
+  }
 
   @ApiOperation({ summary: 'Create a new order placed by `request` user.' })
   @ApiBody({ type: CreateOrderDto })
@@ -51,15 +52,23 @@ export class OrdersController {
   async create(@Body() body: CreateOrderDto, @Req() request: Request) {
     this.logger.debug(
       `Creating order for user, "${
-        request.user?.name
+        request.user.username
       }", with payload: ${this.utils.prettify(body)}...`
     );
 
     try {
-      return this.response.success(await this.ordersService.create(body));
+      const order = await this.ordersService.create(body, request.user);
+
+      return this.response.success(
+        order,
+        `Order (with ID "#${order._id
+          .toString()
+          .slice(0, 8)
+          .toUpperCase()}") successfully placed!📝😎`
+      );
     } catch (e: any) {
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      throw this.response.error(e.message || e);
     }
   }
 
@@ -68,32 +77,32 @@ export class OrdersController {
   @ApiQuery({ type: BaseQueryDto })
   @Get()
   async getAll(@Req() request: Request<any, any, any, BaseQueryDto>) {
-    this.logger.debug(`Getting orders for user, ${request.user?.name}...`);
+    this.logger.debug(`Getting orders for user, ${request.user.username}...`);
 
     try {
       return this.response.success(await this.ordersService.getAll(request));
     } catch (e: any) {
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      throw this.response.error(e.message || e);
     }
   }
 
   @ApiOperation({
-    summary: 'Authenticate user.'
+    summary: 'Find an order by `id`.'
   })
-  @ApiFoundResponse({ type: User })
+  @ApiFoundResponse(NormalizeResponseService.getSuccessSchema(Order))
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: Request) {
     this.logger.debug(
-      `Getting order with id, ${id}, for user, ${request.user?.name}...`
+      `Getting order with id, ${id}, for user, ${request.user.username}...`
     );
 
     try {
       return this.response.success(await this.ordersService.findOne(id));
     } catch (e: any) {
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      throw this.response.error(e.message || e);
     }
   }
 }

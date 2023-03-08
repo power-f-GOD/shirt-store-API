@@ -1,8 +1,8 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
 
 import { UtilsService } from './utils.service';
 
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
   constructor(private utils: UtilsService) {
     super();

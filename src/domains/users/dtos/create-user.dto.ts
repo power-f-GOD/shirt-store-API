@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { User } from '../schemas';
 
-export class CreateUserDto implements Pick<User, 'name'> {
+export class CreateUserDto implements Pick<User, 'username'> {
   @ApiProperty({
     type: String,
     description: 'The (unique) name of the `user`.',
@@ -12,5 +12,5 @@ export class CreateUserDto implements Pick<User, 'name'> {
   })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  username: string;
 }

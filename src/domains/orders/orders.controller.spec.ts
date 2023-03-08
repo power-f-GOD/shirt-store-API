@@ -3,34 +3,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { request as req, Request } from 'express';
 
 import { SharedModule } from 'src/shared/shared.module';
-import { Order } from './schemas';
+import { Order, OrderItem } from './schemas';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { SeedService } from '../seed/seed.service';
 import { ShirtSeed } from '../seed/schemas';
+import { orderItemMock, orderMock, OrderModelMock, userMock } from './mocks';
+import { ShirtSeedModelMock } from '../seed/mocks';
+import { OrderItemModelMock } from './mocks/order-item-model.mock';
 
 describe('OrdersController', () => {
-  const findResult: Order[] = [
-    {
-      _id: 'string',
-      actual_cost: 0,
-      cost: 0,
-      created_at: 'string',
-      discount: 0,
-      item_count: 0,
-      items: [{ count: 0, name: 'string', _id: 'string', price: 0 }],
-      updated_at: 'string'
-    }
-  ];
   const request = req as Request<any, any, any, BaseQueryDto>;
 
-  request.user = {
-    name: 'string',
-    _id: 'string',
-    authenticated: false,
-    created_at: 'string'
-  };
+  request.user = userMock;
 
   let controller: OrdersController;
   let service: OrdersService;
@@ -44,19 +30,15 @@ describe('OrdersController', () => {
         SeedService,
         {
           provide: getModelToken(ShirtSeed.name),
-          useValue: {
-            async find() {
-              return [];
-            }
-          }
+          useClass: ShirtSeedModelMock
         },
         {
           provide: getModelToken(Order.name),
-          useValue: {
-            async find() {
-              return findResult;
-            }
-          }
+          useValue: new OrderModelMock(orderMock)
+        },
+        {
+          provide: getModelToken(OrderItem.name),
+          useValue: new OrderItemModelMock(orderItemMock)
         }
       ]
     }).compile();
@@ -75,15 +57,16 @@ describe('OrdersController', () => {
     it('should create an order and return an Order object', async () => {
       jest
         .spyOn(service, 'create')
-        .mockImplementation(() => Promise.resolve(findResult[0]));
+        .mockImplementation(() => Promise.resolve(orderMock));
       expect(
         await controller.create(
           { items: { '[item_name]': { count: 0 } } },
           request as Request
         )
       ).toStrictEqual({
-        data: findResult[0],
-        path: undefined
+        data: orderMock,
+        path: undefined,
+        message: `Order (with ID \"#STRING\") successfully placed!📝😎`
       });
     });
   });
@@ -92,9 +75,9 @@ describe('OrdersController', () => {
     it('should return a (normalized) response object with an array of orders', async () => {
       jest
         .spyOn(service, 'getAll')
-        .mockImplementation(() => Promise.resolve(findResult));
+        .mockImplementation(() => Promise.resolve([orderMock]));
       expect(await controller.getAll(request)).toStrictEqual({
-        data: findResult,
+        data: [orderMock],
         path: undefined
       });
     });
@@ -104,11 +87,11 @@ describe('OrdersController', () => {
     it('should return an Order if found', async () => {
       jest
         .spyOn(service, 'findOne')
-        .mockImplementation(() => Promise.resolve(findResult[0]));
+        .mockImplementation(() => Promise.resolve(orderMock));
       expect(
         await controller.findOne('string', request as Request)
       ).toStrictEqual({
-        data: findResult[0],
+        data: orderMock,
         path: undefined
       });
     });

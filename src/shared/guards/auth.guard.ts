@@ -5,31 +5,27 @@ import {
   ForbiddenException
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { User } from 'src/domains/users/schemas';
+import { Request } from 'express';
 
-import { IS_AUTHENTICATED_KEY } from '../decorators';
+import { IS_PUBLIC_KEY } from '../decorators';
 import { NormalizeResponseService } from '../services/normalize-response.service';
 
 @Injectable()
-export class AuthenticatedGuard implements CanActivate {
+export class CustomAuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private response: NormalizeResponseService
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const authenticated = this.reflector.getAllAndOverride<boolean>(
-      IS_AUTHENTICATED_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass()
+    ]);
 
-    if (authenticated) {
-      return true;
-    }
+    if (isPublic) return true;
 
-    const { user } = context.switchToHttp().getRequest() as {
-      user: User;
-    };
+    const { user }: Request = context.switchToHttp().getRequest();
 
     if (user?.authenticated) return true;
 

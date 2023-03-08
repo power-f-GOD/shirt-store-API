@@ -5,8 +5,10 @@ import { SeedService } from './seed.service';
 import { LoggerService, NormalizeResponseService } from 'src/shared/services';
 import { AppDomainNamesEnum } from 'src/enums';
 import { ShirtSeed } from './schemas';
+import { Public } from 'src/shared/decorators';
 
 @ApiTags(AppDomainNamesEnum.SEED)
+@Public()
 @Controller(AppDomainNamesEnum.SEED)
 export class SeedController {
   constructor(

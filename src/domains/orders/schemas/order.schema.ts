@@ -36,11 +36,13 @@ export class Order {
   @ApiProperty({
     type: Array(OrderItem)
   })
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'OrderItem' }])
-  items: OrderItem[];
+  @Prop([
+    { type: MongooseSchema.Types.ObjectId, ref: 'OrderItem', required: true }
+  ])
+  items: OrderItem[] | string[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
-  user?: User;
+  user?: User | string;
 
   @ApiProperty({ type: 'string' })
   created_at: string;

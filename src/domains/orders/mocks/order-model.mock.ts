@@ -1,43 +1,17 @@
 import { Order } from '../schemas';
+import { BaseModelMock } from './base-model.mock';
 
-export class OrderModelMock {
-  mockOrder: Order;
-
+export class OrderModelMock extends BaseModelMock {
   constructor(mockOrder: Order) {
-    this.mockOrder = mockOrder;
+    super(mockOrder);
   }
 
   create = jest.fn((order: Order) => {
     return {
       ...order,
-      ...this.mockOrder,
-      items: order.items.map((item) => ({ ...item, _id: 'string', price: 0 }))
+      ...this.documentMock,
+      items: order.items.map(() => 'string'),
+      user: 'string'
     };
   });
-
-  find() {
-    return {
-      skip() {
-        return this;
-      },
-      limit() {
-        return this;
-      },
-      exec: jest.fn().mockResolvedValue(this.mockOrder)
-    };
-  }
-
-  findById(id: string) {
-    return {
-      ...this.find(),
-      exec: jest.fn(() => [this.mockOrder].find((order) => order._id === id))
-    };
-  }
-
-  findOne(id: string) {
-    return {
-      ...this.find(),
-      exec: jest.fn(() => [this.mockOrder].find((order) => order._id === id))
-    };
-  }
 }

@@ -6,20 +6,22 @@ import { Model } from 'mongoose';
 import { BaseQueryDto } from 'src/shared/dtos';
 import { UtilsService } from 'src/shared/services';
 import { SeedService } from '../seed/seed.service';
+import { User } from '../users/schemas';
 import { CreateOrderItemDto } from './dtos';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
-import { Order, OrderDocument } from './schemas';
+import { Order, OrderDocument, OrderItem } from './schemas';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectModel(OrderItem.name) private orderItemModel: Model<OrderDocument>,
     private seeds: SeedService,
     private utils: UtilsService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
     const itemsToArray = Object.entries(createOrderDto.items).map(
       ([name, props]) => ({ ...props, name })
     );
@@ -30,7 +32,11 @@ export class OrdersService {
       }
     }
 
-    const order = await this.orderModel.create({ items: itemsToArray });
+    const orderItems = await this.orderItemModel.create(itemsToArray);
+    const order = await this.orderModel.create({
+      items: orderItems.map((item) => item._id),
+      user: user._id
+    });
 
     return order;
   }

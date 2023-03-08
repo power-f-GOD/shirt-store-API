@@ -26,34 +26,41 @@ import {
 import { User } from './schemas';
 import { ErrorResponseDto } from 'src/shared/dtos';
 import { AppDomainNamesEnum } from 'src/enums';
+import { Public } from 'src/shared/decorators';
 
 @ApiTags(AppDomainNamesEnum.USERS)
 @Controller(AppDomainNamesEnum.USERS)
+@Public()
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private response: NormalizeResponseService,
     private logger: LoggerService,
     private utils: UtilsService
-  ) {}
+  ) {
+    this.logger.setContext(UsersController.name);
+  }
 
   @ApiOperation({ summary: 'Create new user.' })
   @ApiBody({ type: CreateUserDto })
   @ApiCreatedResponse({ type: User })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
   @Post()
-  async create(@Body() body: CreateUserDto) {
+  async createUser(@Body() body: CreateUserDto) {
     this.logger.debug(
       `Creating user for user with payload: ${this.utils.prettify(body)}...`
     );
 
     try {
-      return this.response.success(await this.usersService.create(body));
+      return this.response.success(
+        await this.usersService.create(body),
+        `Welcome to Shirt Store, ${body.username}!😎`
+      );
     } catch (e: any) {
       const isConflict = /exists/.test(e.message);
 
       this.logger.error(e.message || e);
-      return this.response.error(
+      throw this.response.error(
         e,
         e,
         isConflict ? ConflictException : undefined
@@ -66,15 +73,15 @@ export class UsersController {
   })
   @ApiFoundResponse(NormalizeResponseService.getSuccessSchema(User))
   @ApiNotFoundResponse({ type: ErrorResponseDto })
-  @Get(':name')
-  async getOne(@Param('name') name: string) {
-    this.logger.debug(`Getting user by name, ${name}...`);
+  @Get(':name_or_id')
+  async getOneUser(@Param('name_or_id') nameOrId: string) {
+    this.logger.debug(`Getting user by name (or id), ${nameOrId}...`);
 
     try {
-      return this.response.success(await this.usersService.getOne(name));
+      return this.response.success(await this.usersService.getOne(nameOrId));
     } catch (e: any) {
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      throw this.response.error(e.message || e);
     }
   }
 
@@ -85,16 +92,19 @@ export class UsersController {
   @ApiNotFoundResponse({ type: ErrorResponseDto })
   @Post('authenticate')
   /** This is just for to mock authentication. In the real world, this should be done in an `AuthController`. */
-  async authenticate(@Body() { name, type }: AuthenticateUserDto) {
-    this.logger.debug(`Authenticating user by name, ${name}...`);
+  async authenticateUser(@Body() { username, type }: AuthenticateUserDto) {
+    this.logger.debug(`Authenticating user by name, ${username}...`);
 
     try {
+      const user = await this.usersService.authenticate(username, type);
+
       return this.response.success(
-        await this.usersService.authenticate(name, type)
+        user,
+        type !== 'logout' ? 'Welcome!😎' : 'Logged out successfully.'
       );
     } catch (e: any) {
       this.logger.error(e.message || e);
-      return this.response.error(e.message || e);
+      throw this.response.error(e.message || e);
     }
   }
 }

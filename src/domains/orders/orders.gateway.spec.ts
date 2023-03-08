@@ -6,10 +6,11 @@ import { ShirtSeed } from '../seed/schemas';
 import { SeedService } from '../seed/seed.service';
 import { User } from '../users/schemas';
 import { UsersService } from '../users/users.service';
-import { OrderModelMock, orderMock } from './mocks';
+import { OrderModelMock, orderMock, orderItemMock } from './mocks';
+import { OrderItemModelMock } from './mocks/order-item-model.mock';
 import { OrdersGateway } from './orders.gateway';
 import { OrdersService } from './orders.service';
-import { Order } from './schemas';
+import { Order, OrderItem } from './schemas';
 
 describe('OrdersGateway', () => {
   let gateway: OrdersGateway;
@@ -25,6 +26,10 @@ describe('OrdersGateway', () => {
         {
           provide: getModelToken(Order.name),
           useValue: new OrderModelMock(orderMock)
+        },
+        {
+          provide: getModelToken(OrderItem.name),
+          useValue: new OrderItemModelMock(orderItemMock)
         },
         {
           provide: getModelToken(User.name),
