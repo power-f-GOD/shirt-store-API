@@ -28,7 +28,7 @@ API for Shirt Store UI built with [NodeJS](https://nodejs.org/) and the [NestJS]
    mongod
    ```
 
-`Sidebar:` In a case where the Mongo server doesn't start up, you may want to check that you have a `/data/db/` directory created somewhere in your PC's `Users/<user_name>/` directory. Also, inspect the logs to see the causal error(s).
+`Sidebar:` In a case where the Mongo server doesn't start up, you may want to check that you have a `/data/db/` directory created somewhere in your PC's `Users/<user_name>/` directory and then run `mongod --dbPath data/db` from the directory where `data` is located. Also, inspect the logs to see the causal error(s).
 
 4. Start the server (in another terminal):
 

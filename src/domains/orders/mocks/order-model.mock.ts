@@ -7,11 +7,22 @@ export class OrderModelMock extends BaseModelMock {
   }
 
   create = jest.fn((order: Order) => {
-    return {
+    console.log({ order });
+    const createdOrder = {
       ...order,
       ...this.documentMock,
-      items: order.items.map(() => 'string'),
+      items: order.items?.map(() => 'string') || [],
       user: 'string'
+    };
+
+    return {
+      save: jest.fn(() => {
+        return {
+          populate() {
+            return createdOrder;
+          }
+        };
+      })
     };
   });
 }

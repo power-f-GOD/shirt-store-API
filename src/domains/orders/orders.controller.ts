@@ -10,6 +10,7 @@ import {
 import { Request } from 'express';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiFoundResponse,
@@ -32,6 +33,7 @@ import { AppDomainNamesEnum } from 'src/enums';
 import { CustomAuthGuard } from 'src/shared/guards';
 
 @ApiTags(AppDomainNamesEnum.ORDERS)
+@ApiBearerAuth()
 @UseGuards(CustomAuthGuard)
 @Controller(AppDomainNamesEnum.ORDERS)
 export class OrdersController {

@@ -9,7 +9,17 @@ export class BaseModelMock<ModelSchema extends { _id?: string } = Order> {
 
   find() {
     return {
+      sort() {
+        return this;
+      },
       skip() {
+        return this;
+      },
+      populate() {
+        return this;
+      },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      select(_selection: string) {
         return this;
       },
       limit() {

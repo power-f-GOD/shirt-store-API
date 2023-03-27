@@ -14,6 +14,12 @@ export type OrderDocument = HydratedDocument<Order>;
   }
 })
 export class Order {
+  @ApiProperty({
+    type: Array(OrderItem)
+  })
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'OrderItem' }])
+  items: OrderItem[] | string[];
+
   @ApiProperty({ type: 'string' })
   _id: string;
 
@@ -32,14 +38,6 @@ export class Order {
   @ApiProperty({ type: 'number' })
   @Prop({ max: 1, min: 0 })
   discount: number;
-
-  @ApiProperty({
-    type: Array(OrderItem)
-  })
-  @Prop([
-    { type: MongooseSchema.Types.ObjectId, ref: 'OrderItem', required: true }
-  ])
-  items: OrderItem[] | string[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   user?: User | string;

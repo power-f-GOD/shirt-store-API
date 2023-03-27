@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsObject, ValidateNested } from 'class-validator';
+import { IsObject } from 'class-validator';
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 import { CreateOrderItemDto } from './create-order-item.dto';
@@ -23,7 +23,6 @@ export class CreateOrderDto
   })
   @Expose()
   @IsObject()
-  @ValidateNested()
   items: Record<string, CreateOrderItemDto>;
 
   cost?: number;
@@ -31,4 +30,6 @@ export class CreateOrderDto
   actual_cost?: number;
 
   discount?: number;
+
+  item_count?: number;
 }

@@ -25,6 +25,7 @@ const bootstrap = async () => {
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('Shirt Store')
     .setDescription('API for Shirt Store UI.')
     .setVersion('1.0')

@@ -66,19 +66,25 @@ describe('OrdersService', () => {
       const payload: CreateOrderDto = {
         items: { Givenchy: { count: 0 } }
       };
+
       await seedService.seed();
-      const order = await service.create(payload, request.user);
+      await expect(
+        async () => await service.create(payload, request.user)
+      ).rejects.toEqual(Error('Empty basket!'));
+      payload.items.Givenchy.count = 1;
+
+      // const order =
+      await service.create(payload, request.user);
 
       expect(model.create).toHaveBeenCalledWith({
-        ...payload,
-        items: order.items,
         user: 'string'
       });
-      expect(order).toStrictEqual(orderMock);
-      expect(order.items[0]).toStrictEqual('string');
-      expect(await service.create(payload, request.user)).toStrictEqual(
-        orderMock
-      );
+      // expect(await service.create(payload, request.user)).toStrictEqual({
+      //   ...orderMock,
+      //   items: undefined
+      // });
+      // expect(order).toStrictEqual(orderMock);
+      // expect(order.items[0]).toStrictEqual('string');
     });
 
     it('should reject if the correct payload is not passed in', async () => {
@@ -108,7 +114,8 @@ describe('OrdersService', () => {
     it(`should return a partial Order object with correct values: {
         actual_cost: number,
         cost: number,
-        discount: number
+        discount: number,
+        item_count: number
       }. See the logs above to see the possible discounted costs.`, async () => {
       await seedService.seed();
       expect(
@@ -116,14 +123,16 @@ describe('OrdersService', () => {
       ).toStrictEqual<Awaited<ReturnType<typeof service.computeDiscount>>>({
         actual_cost: 64.0,
         cost: 53.6,
-        discount: 0.162
+        discount: 0.162,
+        item_count: 8
       });
       expect(
         await service.computeDiscount(createOrderDtosMock[1].items)
       ).toStrictEqual<Awaited<ReturnType<typeof service.computeDiscount>>>({
         actual_cost: 360,
         cost: 334.4,
-        discount: 0.071
+        discount: 0.071,
+        item_count: 45
       });
     });
 

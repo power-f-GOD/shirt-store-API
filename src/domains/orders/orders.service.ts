@@ -23,7 +23,11 @@ export class OrdersService {
 
   async create(createOrderDto: CreateOrderDto, user: User): Promise<Order> {
     const itemsToArray = Object.entries(createOrderDto.items).map(
-      ([name, props]) => ({ ...props, name })
+      ([name, props]) => ({
+        ...props,
+        name,
+        price: this.seeds.shirts.get(name)?.price
+      })
     );
 
     for (const item of itemsToArray) {
@@ -32,13 +36,22 @@ export class OrdersService {
       }
     }
 
-    const orderItems = await this.orderItemModel.create(itemsToArray);
+    const { actual_cost, cost, discount, item_count } =
+      await this.computeDiscount(createOrderDto.items, true);
     const order = await this.orderModel.create({
-      items: orderItems.map((item) => item._id),
       user: user._id
     });
+    const orderItems = await this.orderItemModel.create(
+      itemsToArray.map((item) => ({ ...item, order: order._id }))
+    );
 
-    return order;
+    order.actual_cost = actual_cost;
+    order.cost = cost;
+    order.discount = discount;
+    order.item_count = item_count;
+    order.items = orderItems.map((item) => item._id);
+
+    return await (await order.save()).populate('items', 'name count price');
   }
 
   async getAll({
@@ -46,14 +59,20 @@ export class OrdersService {
     query
   }: Request<any, any, any, BaseQueryDto>): Promise<Order[]> {
     return await this.orderModel
-      .find({ _id: user._id })
+      .find({ user: user._id })
+      .sort({ created_at: 'desc' })
+      .select('-user -updated_at -items')
       .limit(query.count || 10)
       .skip(query.skip || 0)
       .exec();
   }
 
   async findOne(id: string): Promise<Order | null> {
-    return await this.orderModel.findById(id).exec();
+    return await this.orderModel
+      .findById(id)
+      .select('-user -updated_at')
+      .populate('items')
+      .exec();
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
@@ -66,11 +85,12 @@ export class OrdersService {
   }
 
   async computeDiscount(
-    items: CreateOrderDto['items']
+    items: CreateOrderDto['items'],
+    isCreating?: boolean
   ): Promise<Omit<Required<CreateOrderDto>, 'items'>> {
     const itemsToArray: CreateOrderItemDto[] = [];
     let actual_cost = 0;
-    let itemCount = 0;
+    let item_count = 0;
 
     for (const name in items) {
       const shirtSeed = this.seeds.shirts.get(name);
@@ -78,17 +98,18 @@ export class OrdersService {
 
       if (!shirtSeed) throw new Error(`Invalid shirt, "${name}".`);
 
-      if (item.count) {
+      if (item.count > 0) {
         itemsToArray.push({ count: item.count, price: shirtSeed.price });
-        itemCount += item.count;
+        item_count += item.count;
+        actual_cost += shirtSeed.price * item.count;
       }
-
-      actual_cost += shirtSeed.price * item.count;
     }
+
+    if (!itemsToArray.length && isCreating) throw new Error('Empty basket!');
 
     const [firstDiscountedCost, secondDiscountedCost] = await Promise.all([
       this.computeDiscountedCostFirstWay(itemsToArray, actual_cost),
-      this.computeDiscountedCostSecondWay(itemsToArray, actual_cost, itemCount)
+      this.computeDiscountedCostSecondWay(itemsToArray, actual_cost, item_count)
     ]);
     const lowestPossibleDiscountedCost = Math.min(
       firstDiscountedCost,
@@ -100,7 +121,8 @@ export class OrdersService {
       secondDiscountedCost,
       lowestPossibleDiscountedCost,
       actual_cost,
-      itemsToArray
+      itemsToArray,
+      item_count
     });
 
     return {
@@ -109,6 +131,7 @@ export class OrdersService {
         { maximumFractionDigits: 3 }
       ),
       actual_cost,
+      item_count,
       cost: lowestPossibleDiscountedCost
     };
   }
